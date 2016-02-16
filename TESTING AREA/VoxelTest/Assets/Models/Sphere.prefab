@@ -139,18 +139,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 779c9d32e1f2e90478dd38ef5d135585, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  voxelSideSize: 0.01
-  fillVoxelShell: 1
+  voxelSideSize: 0.2
+  fillVoxelShell: 0
   includeChildren: 1
-  createMultipleGrids: 1
+  createMultipleGrids: 0
   material: {fileID: 2100000, guid: 148998371aa149d4face9a23c322d998, type: 2}
-  drawActiveVoxelsGizmo: 1
+  destroyObject: 1
+  drawActiveVoxelsGizmo: 0
   activeVoxelsColor: {r: 1, g: 0, b: 0, a: 0.5}
   drawInactiveVoxelsGizmo: 0
   inactiveVoxelsColor: {r: 0, g: 1, b: 0, a: 0.5}
   voxelGridViewOffset: {x: 0, y: 0, z: 0}
   calculationKey: 97
   spawningKey: 115
+  allKey: 100
 --- !u!135 &13577870
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -185,7 +187,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 0}
       propertyPath: createMultipleGrids
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: includeChildren
@@ -237,7 +239,7 @@ Prefab:
       objectReference: {fileID: 101276, guid: cf8822b9752b7c243a6f9074a01a14ad, type: 2}
     - target: {fileID: 0}
       propertyPath: voxelSideSize
-      value: 0.01
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: material
@@ -255,6 +257,18 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: spawningKey
       value: 115
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: fillVoxelShell
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: drawActiveVoxelsGizmo
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: allKey
+      value: 100
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

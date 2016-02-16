@@ -13,9 +13,10 @@ public class VoxelizationClientTest : MonoBehaviour
     public bool createMultipleGrids = true;
 
     public Material material;
+    public bool destroyObject = true;
 
     //Debug variables
-    private static bool debug = true;
+    private static bool debug = false;
     public bool drawActiveVoxelsGizmo = true;
     public Color activeVoxelsColor = new Color(1, 0, 0, 0.5f);
     public bool drawInactiveVoxelsGizmo = false;
@@ -23,6 +24,7 @@ public class VoxelizationClientTest : MonoBehaviour
     public Vector3 voxelGridViewOffset = Vector3.zero;
     public KeyCode calculationKey;
     public KeyCode spawningKey;
+    public KeyCode allKey;
 
     
     private List<VoxelizationServer.AABCGrid> aABCGrids;
@@ -207,6 +209,8 @@ public class VoxelizationClientTest : MonoBehaviour
                     }
                 }
             }
+            if (destroyObject)
+                DestroyObject(gameObject);
         }
 
         if (debug)
@@ -220,7 +224,12 @@ public class VoxelizationClientTest : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(calculationKey))
+        if (Input.GetKeyDown(allKey))
+        {
+            CalculateVoxelsGrid();
+            SpawnVoxels();
+        }
+        else if (Input.GetKeyDown(calculationKey))
         {         
             CalculateVoxelsGrid();              
         }
