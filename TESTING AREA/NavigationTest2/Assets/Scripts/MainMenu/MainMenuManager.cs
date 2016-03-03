@@ -2,21 +2,20 @@
 using UnityEngine.SceneManagement;
 using System.Collections;
 
-public class MainMenuController : MonoBehaviour {
+public class MainMenuManager : MonoBehaviour {
 
     public GameObject help;
     private bool helpOpen = false;
-    
-	// Update is called once per frame
-	void Update ()
+
+    // Update is called once per frame
+    void Update()
     {
-        //if(Input.GetButtonDown("joystickbutton7"))
-        if (helpOpen && Input.GetKeyDown(KeyCode.Joystick1Button1))
+        if (helpOpen && Input.GetButtonDown("Back"))
         {
             help.SetActive(false);
             helpOpen = false;
         }
-	}
+    }
 
     public void OnClickStart()
     {

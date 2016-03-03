@@ -8,16 +8,17 @@ public class ObjectPool : MonoBehaviour {
     public int poolSize = 100;
 
     private Queue<GameObject> pool;
-    
 
 	// Use this for initialization
 	void Awake () {
+        Transform trans = transform;
         GameObject aux;
         pool = new Queue<GameObject>(poolSize);
         for (int i = 0; i < poolSize; ++i)
         {
             aux = Instantiate(pooledObject);
             aux.SetActive(false);
+            aux.transform.SetParent(trans);
             pool.Enqueue(aux);
         }
     }

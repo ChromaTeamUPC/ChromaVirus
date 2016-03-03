@@ -6,43 +6,32 @@ using System.Collections;
 public class PlayerHealth : MonoBehaviour {
 
     public int health = 100;
-    public Text healthTxt;
-    public Text win;
-    public Text gameOver;
 
-    // Use this for initialization
-    void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-        healthTxt.text = "Life: " + health;
+    public void Start()
+    {
+        mng.eventManager.TriggerEvent(EventManager.EventType.PLAYER_SPAWNED, new PlayerDamagedEventInfo { damage = 0, currentHealth = health });
+    }
 
-        if(health <= 0)
+    public void TakeDamage(int damage)
+    {
+        health -= damage;
+
+        if (health <= 0) health = 0;
+
+        //Send event
+        mng.eventManager.TriggerEvent(EventManager.EventType.PLAYER_DAMAGED, new PlayerDamagedEventInfo { damage = damage, currentHealth = health });
+
+        if (health == 0)
         {
-            gameOver.gameObject.SetActive(true);
-            StartCoroutine("GoToMainMenu");
+            mng.eventManager.TriggerEvent(EventManager.EventType.PLAYER_DIED, EventInfo.emptyInfo);
         }
-	}
+    }
 
     void OnTriggerEnter(Collider other)
     {
         if (other.tag == "DeathZone")
         {
-            health = 0;
-        }
-        else if (other.tag == "WinZone")
-        {
-            win.gameObject.SetActive(true);
-            StartCoroutine("GoToMainMenu");
-        }
-    }
-
-    IEnumerator GoToMainMenu()
-    {
-        yield return new WaitForSeconds(3.0f);
-
-        SceneManager.LoadScene(0);
+            TakeDamage(health);
+        }     
     }
 }

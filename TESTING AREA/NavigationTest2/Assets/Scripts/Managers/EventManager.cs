@@ -3,7 +3,17 @@ using UnityEngine.Events;
 using System.Collections;
 using System.Collections.Generic;
 
-public class EventInfo {}
+public class EventInfo
+{
+    //Events that need no extra info, can use this object to improve performance
+    public static EventInfo emptyInfo = new EventInfo();
+}
+
+public class PlayerDamagedEventInfo : EventInfo
+{
+    public int damage;
+    public int currentHealth;
+}
 
 public class ColorChangedEventInfo : EventInfo
 {
@@ -18,10 +28,9 @@ public class EventManager : MonoBehaviour {
 
     public enum EventType
     {
-        COLOR_RED,
-        COLOR_GREEN,
-        COLOR_BLUE,
-        COLOR_YELLOW,
+        PLAYER_SPAWNED,
+        PLAYER_DAMAGED,
+        PLAYER_DIED,
         COLOR_CHANGED
     }
 
