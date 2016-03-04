@@ -4,8 +4,12 @@ using System.Collections;
 public class PlayerShoot : MonoBehaviour {
 
     //public GameObject shot;
-    public Transform shotSpawn;
+    public float maxEnergy = 100;
+    public float energyLostPerShot = 5;
+    public float energyRecoveryPerSecond = 5;
+    public float currentEnergy;
     public float fireRate;
+    public Transform shotSpawn; 
     public Material redMaterial;
     public Material greenMaterial;
     public Material blueMaterial;
@@ -18,6 +22,7 @@ public class PlayerShoot : MonoBehaviour {
 
     void Start()
     {
+        currentEnergy = maxEnergy;
         shotObjectPool = mng.poolManager.shotPool;
         mng.eventManager.StartListening(EventManager.EventType.COLOR_CHANGED, ColorChanged);
         currentMaterial = redMaterial;
@@ -25,7 +30,7 @@ public class PlayerShoot : MonoBehaviour {
 
     void ColorChanged(EventInfo eventInfo)
     {
-        ColorChangedEventInfo info = (ColorChangedEventInfo)eventInfo;
+        ColorEventInfo info = (ColorEventInfo)eventInfo;
 
         currentColor = info.newColor;
 
@@ -49,7 +54,7 @@ public class PlayerShoot : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-        if (Input.GetButton("P1_Fire") && Time.time > nextFire)
+        if (Input.GetButton("P1_Fire") && Time.time > nextFire && currentEnergy >= energyLostPerShot)
         {
             nextFire = Time.time + fireRate;
 
@@ -66,10 +71,13 @@ public class PlayerShoot : MonoBehaviour {
                 shot.SetActive(true);
             }
 
-            /*GameObject spawn = Instantiate(shot, shotSpawn.position, shotSpawn.rotation) as GameObject;
-            ShootMover shotScript = spawn.GetComponent<ShootMover>();
-            shotScript.color = currentColor;
-            spawn.GetComponent<Renderer>().material = currentMaterial;*/
+            currentEnergy -= energyLostPerShot;
+        }
+
+        if (currentEnergy < maxEnergy)
+        {
+            currentEnergy += Time.deltaTime * energyRecoveryPerSecond;
+            if (currentEnergy > maxEnergy) currentEnergy = maxEnergy;
         }
     }
 }

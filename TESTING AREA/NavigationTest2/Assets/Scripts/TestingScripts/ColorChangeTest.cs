@@ -25,7 +25,7 @@ public class ColorChangeTest : MonoBehaviour {
 
     void ColorChanged(EventInfo eventInfo)
     {
-        ColorChangedEventInfo info = (ColorChangedEventInfo)eventInfo;
+        ColorEventInfo info = (ColorEventInfo)eventInfo;
 
         switch (info.newColor)
         {

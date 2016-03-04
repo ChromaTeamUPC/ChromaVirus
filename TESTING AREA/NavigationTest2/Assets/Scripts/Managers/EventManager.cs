@@ -15,7 +15,7 @@ public class PlayerDamagedEventInfo : EventInfo
     public int currentHealth;
 }
 
-public class ColorChangedEventInfo : EventInfo
+public class ColorEventInfo : EventInfo
 {
     public ChromaColor newColor;
 }
@@ -31,6 +31,8 @@ public class EventManager : MonoBehaviour {
         PLAYER_SPAWNED,
         PLAYER_DAMAGED,
         PLAYER_DIED,
+        ENEMY_SPAWNED,
+        ENEMY_DIED,
         COLOR_CHANGED
     }
 

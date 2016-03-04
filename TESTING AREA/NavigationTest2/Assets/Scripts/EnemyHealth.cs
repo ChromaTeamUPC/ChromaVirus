@@ -16,6 +16,16 @@ public class EnemyHealth : MonoBehaviour {
 	
 	}
 
+    void OnEnable()
+    {
+        //mng.eventManager.TriggerEvent(EventManager.EventType.ENEMY_SPAWNED, new ColorEventInfo { newColor = color });
+    }
+
+    void OnDisable()
+    {
+        //mng.eventManager.TriggerEvent(EventManager.EventType.ENEMY_DIED, new ColorEventInfo { newColor = color });
+    }
+
     public void ImpactedByShot(ChromaColor shotColor, int damage)
     {
         if (shotColor == color)

@@ -5,7 +5,13 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour {
 
-    public Text healthTxt;
+    public GameObject player1;
+    private PlayerHealth player1Health;
+    private PlayerShoot player1Shot;
+
+    public Text player1HealthTxt;
+    public Text player1EnergyTxt;
+
     public Text win;
     public Text gameOver;
 
@@ -14,18 +20,28 @@ public class GameManager : MonoBehaviour {
         mng.eventManager.StartListening(EventManager.EventType.PLAYER_SPAWNED, PlayerSpawned);
         mng.eventManager.StartListening(EventManager.EventType.PLAYER_DAMAGED, PlayerDamaged);
         mng.eventManager.StartListening(EventManager.EventType.PLAYER_DIED, PlayerDied);
+
+        player1Health = player1.GetComponent<PlayerHealth>();
+        player1Shot = player1.GetComponent<PlayerShoot>();
     }
+
+    void Update()
+    {
+        player1EnergyTxt.text = "Energy: " + (int)player1Shot.currentEnergy;
+
+    }
+
 
     void PlayerSpawned(EventInfo eventInfo)
     {
         PlayerDamagedEventInfo info = (PlayerDamagedEventInfo)eventInfo;
-        healthTxt.text = "Life: " + info.currentHealth;
+        player1HealthTxt.text = "Life: " + info.currentHealth;
     }
 
     void PlayerDamaged(EventInfo eventInfo)
     {
         PlayerDamagedEventInfo info = (PlayerDamagedEventInfo)eventInfo;
-        healthTxt.text = "Life: " + info.currentHealth;
+        player1HealthTxt.text = "Life: " + info.currentHealth;
     }
 
     void PlayerDied(EventInfo eventInfo)
