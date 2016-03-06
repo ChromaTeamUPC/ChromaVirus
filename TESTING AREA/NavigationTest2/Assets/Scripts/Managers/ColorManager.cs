@@ -17,7 +17,7 @@ public enum ChromaColor
 public class ColorManager : MonoBehaviour {
     public int changeInterval;
 
-    private int[] colorCount = new int[] { 1, 0, 1, 0 };
+    private int[] colorCount = new int[] { 0, 0, 0, 0 };
     private ChromaColor currentColor;
     private int elapsedTime = 0;
 
@@ -25,7 +25,7 @@ public class ColorManager : MonoBehaviour {
     void Start () {
         currentColor = ChromaColor.RED;
         mng.eventManager.StartListening(EventManager.EventType.ENEMY_SPAWNED, EnemySpawned);
-        mng.eventManager.StartListening(EventManager.EventType.ENEMY_SPAWNED, EnemyDied);
+        mng.eventManager.StartListening(EventManager.EventType.ENEMY_DIED, EnemyDied);
     }
 
     public void EnemySpawned(EventInfo eventInfo)
@@ -38,6 +38,7 @@ public class ColorManager : MonoBehaviour {
     {
         ColorEventInfo info = (ColorEventInfo)eventInfo;
         --colorCount[(int)info.newColor];
+        if (colorCount[(int)info.newColor] < 0) colorCount[(int)info.newColor] = 0;
     }
 
     void FixedUpdate () {

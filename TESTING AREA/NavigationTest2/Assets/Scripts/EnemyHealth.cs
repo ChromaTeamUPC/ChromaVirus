@@ -3,27 +3,34 @@ using System.Collections;
 
 public class EnemyHealth : MonoBehaviour {
 
-    public int health = 30;
+    public int maxHealthth = 30;
     public ChromaColor color = ChromaColor.RED;
 
+    private int currentHealth;
+    private VoxelizationClient voxelization;
+    private ObjectPool enemyPool;
+
 	// Use this for initialization
-	void Start () {
-	
+	void Awake ()
+    {     
+        voxelization = GetComponent<VoxelizationClient>();      
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+
+    void Start()
+    {
+        enemyPool = mng.poolManager.aracnoBotPool;
+    }
 
     void OnEnable()
     {
-        //mng.eventManager.TriggerEvent(EventManager.EventType.ENEMY_SPAWNED, new ColorEventInfo { newColor = color });
+        currentHealth = maxHealthth;
+        voxelization.SetMaterial(color);
+        mng.eventManager.TriggerEvent(EventManager.EventType.ENEMY_SPAWNED, new ColorEventInfo { newColor = color });
     }
 
     void OnDisable()
     {
-        //mng.eventManager.TriggerEvent(EventManager.EventType.ENEMY_DIED, new ColorEventInfo { newColor = color });
+        mng.eventManager.TriggerEvent(EventManager.EventType.ENEMY_DIED, new ColorEventInfo { newColor = color });
     }
 
     public void ImpactedByShot(ChromaColor shotColor, int damage)
@@ -37,11 +44,14 @@ public class EnemyHealth : MonoBehaviour {
 
     public void TakeDamage(int damage)
     {
-        health -= damage;
+        currentHealth -= damage;
 
-        if (health <= 0) 
+        if (currentHealth <= 0) 
         {
-            Destroy(gameObject);
+            voxelization.SetMaterial(color);
+            voxelization.CalculateVoxelsGrid();
+            voxelization.SpawnVoxels();
+            enemyPool.AddObject(gameObject);
         }
     }
 }

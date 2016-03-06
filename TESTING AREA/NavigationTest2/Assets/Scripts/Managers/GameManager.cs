@@ -5,6 +5,10 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour {
 
+    public Transform spawnPoint1;
+    public Transform spawnPoint2;
+    public Transform spawnPoint3;
+
     public GameObject player1;
     private PlayerHealth player1Health;
     private PlayerShoot player1Shot;
@@ -15,6 +19,13 @@ public class GameManager : MonoBehaviour {
     public Text win;
     public Text gameOver;
 
+    public Material enemyRedMaterial;
+    public Material enemyGreenMaterial;
+    public Material enemyBlueMaterial;
+    public Material enemyYellowMaterial;
+    private ObjectPool aracnoBotPool;
+
+
     // Use this for initialization
     void Start () {
         mng.eventManager.StartListening(EventManager.EventType.PLAYER_SPAWNED, PlayerSpawned);
@@ -23,6 +34,38 @@ public class GameManager : MonoBehaviour {
 
         player1Health = player1.GetComponent<PlayerHealth>();
         player1Shot = player1.GetComponent<PlayerShoot>();
+
+        aracnoBotPool = mng.poolManager.aracnoBotPool;
+
+        //Test
+        InvokeRepeating("SpawnEnemies", 2f, 3f);
+    }
+
+    void SpawnEnemies()
+    {
+        //Get enemy from pool
+        GameObject enemy = aracnoBotPool.GetObject();
+        //Set objective goal
+        EnemyMovement eMov = enemy.GetComponent<EnemyMovement>();
+        eMov.goal = player1.transform;
+
+        //Set spawnpoint
+        enemy.transform.position = spawnPoint1.transform.position;
+        
+        ChromaColor randColor = (ChromaColor)Random.Range((int)ChromaColorInfo.First, (int)ChromaColorInfo.Last);
+        enemy.GetComponent<EnemyHealth>().color = randColor;
+        Material mat = enemyRedMaterial;
+        switch(randColor)
+        {
+            case ChromaColor.RED: mat = enemyRedMaterial; break;
+            case ChromaColor.GREEN: mat = enemyGreenMaterial; break;
+            case ChromaColor.BLUE: mat = enemyBlueMaterial; break;
+            case ChromaColor.YELLOW: mat = enemyYellowMaterial; break;
+        }
+        enemy.GetComponent<Renderer>().material = mat;
+
+        //Activate enemy
+        enemy.SetActive(true);
     }
 
     void Update()
@@ -44,13 +87,13 @@ public class GameManager : MonoBehaviour {
         player1HealthTxt.text = "Life: " + info.currentHealth;
     }
 
-    void PlayerDied(EventInfo eventInfo)
+    public void PlayerDied(EventInfo eventInfo)
     {
         gameOver.gameObject.SetActive(true);
         StartCoroutine("GoToMainMenu");
     }
 
-    void PlayerWin()
+    public void PlayerWin()
     {
         win.gameObject.SetActive(true);
         StartCoroutine("GoToCredits");
