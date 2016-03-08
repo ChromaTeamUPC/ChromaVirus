@@ -5,6 +5,9 @@ public class DebugKeys : MonoBehaviour {
 
     public KeyCode mainCameraActivationKey;
     public KeyCode godCameraActivationKey;
+    public KeyCode staticCamera1ActivationKey;
+    public KeyCode staticCamera2ActivationKey;
+    public KeyCode staticCamera3ActivationKey;
     //... morrrre camerrasssss
 
     public KeyCode toggleStatsKey;

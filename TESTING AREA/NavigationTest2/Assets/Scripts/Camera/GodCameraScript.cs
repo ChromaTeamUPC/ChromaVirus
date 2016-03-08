@@ -6,13 +6,19 @@ public class GodCameraScript : MonoBehaviour {
     public int speed = 10;
     public DebugKeys keys;
 
-	// Use this for initialization
-	void Start () {
-	
-	}
+    public Camera godCamera;
+
+    public float minY = -60.0f;
+    public float maxY = 60.0f;
+
+    public float sens = 100.0f;
+
+    float rotationY = 0.0f;
+    float rotationX = 0.0f;
 	
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+    {
 	    if(Input.GetKey(keys.godCameraRight))
         {
             Vector3 displacement = transform.right * Time.deltaTime * speed;
@@ -33,5 +39,11 @@ public class GodCameraScript : MonoBehaviour {
             Vector3 displacement = transform.forward * Time.deltaTime * speed * -1;
             transform.position = transform.position + displacement;
         }
+
+        // camera rotation with mouse coordinates
+        rotationX += Input.GetAxis("Mouse X") * sens * Time.deltaTime;
+        rotationY += Input.GetAxis("Mouse Y") * sens * Time.deltaTime;
+        rotationY = Mathf.Clamp(rotationY, minY, maxY);
+        transform.localEulerAngles = new Vector3(-rotationY, rotationX, 0);
     }
 }
