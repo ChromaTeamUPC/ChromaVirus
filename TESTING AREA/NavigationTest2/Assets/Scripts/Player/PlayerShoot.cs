@@ -54,7 +54,7 @@ public class PlayerShoot : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-        if (Input.GetButton("P1_Fire") && Time.time > nextFire && currentEnergy >= energyLostPerShot)
+        if (Input.GetAxisRaw("P1_Fire") > 0.5f && Time.time > nextFire && currentEnergy >= energyLostPerShot)
         {
             nextFire = Time.time + fireRate;
 

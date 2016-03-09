@@ -28,32 +28,32 @@ public class CameraManager : MonoBehaviour {
     void ChangeCamera(int cameraIndex)
     {
         //Disable all cameras
-        //mainCamera.enabled = false;
-        //godCamera.enabled = false;
         mainCameraObj.SetActive(false);
         godCameraObj.SetActive(false);
         staticCamera1Obj.SetActive(false);
         staticCamera2Obj.SetActive(false);
         staticCamera3Obj.SetActive(false);
 
-        //Enable selected camera
+        GameObject camera = mainCameraObj;
+        //Find selected camera
         switch (cameraIndex)
         {
-            case 0:
-                mainCameraObj.SetActive(true);
-                break;
             case 1:
-                godCameraObj.SetActive(true);
+                camera = godCameraObj;
                 break;
             case 2:
-                staticCamera1Obj.SetActive(true);
+                camera = staticCamera1Obj;
                 break;
             case 3:
-                staticCamera2Obj.SetActive(true);
+                camera = staticCamera2Obj;
                 break;
             case 4:
-                staticCamera3Obj.SetActive(true);
+                camera = staticCamera3Obj;
                 break;
         }
+
+        //Enable it and send event
+        camera.SetActive(true);
+        mng.eventManager.TriggerEvent(EventManager.EventType.CAMERA_CHANGED, new CameraEventInfo { newCamera = camera });
     }
 }

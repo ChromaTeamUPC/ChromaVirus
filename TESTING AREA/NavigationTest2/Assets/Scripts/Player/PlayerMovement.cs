@@ -3,16 +3,26 @@ using System.Collections;
 
 public class PlayerMovement : MonoBehaviour {
     public float speed = 10;
-    public float aimThreshold = 0.20f;
+    public float angularSpeed = 360;
+    public float aimThreshold = 0.2f;
 
-    private Rigidbody rigidBody;
-    private Transform transf;
     public Transform cameraTransform;
+    private Rigidbody rigidBody;
 
 	void Awake () {
         rigidBody = GetComponent<Rigidbody>();
-        transf = transform;
     }	
+
+    void Start()
+    {
+        mng.eventManager.StartListening(EventManager.EventType.CAMERA_CHANGED, CameraChanged);
+    }
+
+    void CameraChanged(EventInfo eventInfo)
+    {
+        CameraEventInfo info = (CameraEventInfo)eventInfo;
+        cameraTransform = info.newCamera.transform;
+    }
 
     void FixedUpdate()
     {    
@@ -22,31 +32,40 @@ public class PlayerMovement : MonoBehaviour {
 
     void Move()
     {
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
+        float h = Input.GetAxisRaw("P1_Horizontal");
+        float v = Input.GetAxisRaw("P1_Vertical");
 
         Vector3 displacement = new Vector3(h, 0f, v);
-        displacement = cameraTransform.TransformDirection(displacement);
-        displacement.y = 0;
 
-        //rigidBody.velocity = displacement * speed;
-        
-        displacement = displacement * speed * Time.deltaTime; 
-        transf.position = transf.position + displacement;    
+        //Get the Y rotation angle from the camera
+        float camRotation = cameraTransform.rotation.eulerAngles.y;
+        //Apply that rotation to the direction vector
+        displacement = Quaternion.Euler(0, camRotation, 0) * displacement;
+
+        //Add velocity and apply it
+        displacement = displacement * speed * Time.deltaTime;
+        rigidBody.MovePosition(rigidBody.position + displacement);   
     }
 
     void Turn()
     {
-        float h = Input.GetAxisRaw("AimHorizontal");
-        float v = Input.GetAxisRaw("AimVertical");
+        float h = Input.GetAxisRaw("P1_AimHorizontal");
+        float v = Input.GetAxisRaw("P1_AimVertical");
 
         if (Mathf.Abs(v) >= aimThreshold || Mathf.Abs(h) >= aimThreshold)
         {
             Vector3 lookAt = new Vector3(h, 0, v);
 
-            lookAt = cameraTransform.TransformDirection(lookAt);
-            transf.rotation = Quaternion.LookRotation(lookAt);
-            transf.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
-        }      
+            //Get the Y rotation angle from the camera
+            float camRotation = cameraTransform.rotation.eulerAngles.y;
+            //Apply that rotation to the direction vector
+            lookAt = Quaternion.Euler(0, camRotation, 0) * lookAt;
+
+            //Get the smoothed rotation quaternion
+            Quaternion rotation = Quaternion.LookRotation(lookAt, Vector3.up);
+            rotation = Quaternion.RotateTowards(rigidBody.rotation, rotation, angularSpeed * Time.deltaTime);  
+            //Apply it to rigidbody
+            rigidBody.MoveRotation(rotation);
+        }
     }
 }

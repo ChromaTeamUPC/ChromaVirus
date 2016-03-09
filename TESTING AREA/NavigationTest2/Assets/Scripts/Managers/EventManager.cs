@@ -20,6 +20,11 @@ public class ColorEventInfo : EventInfo
     public ChromaColor newColor;
 }
 
+public class CameraEventInfo : EventInfo
+{
+    public GameObject newCamera;
+}
+
 [System.Serializable]
 public class CustomEvent : UnityEvent<EventInfo> { }
 
@@ -33,7 +38,8 @@ public class EventManager : MonoBehaviour {
         PLAYER_DIED,
         ENEMY_SPAWNED,
         ENEMY_DIED,
-        COLOR_CHANGED
+        COLOR_CHANGED,
+        CAMERA_CHANGED
     }
 
     private Dictionary<EventType, CustomEvent> eventDictionary;

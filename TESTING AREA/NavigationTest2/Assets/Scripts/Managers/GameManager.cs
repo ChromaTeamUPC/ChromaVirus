@@ -52,7 +52,7 @@ public class GameManager : MonoBehaviour {
         //Set spawnpoint
         enemy.transform.position = spawnPoint1.transform.position;
         
-        ChromaColor randColor = (ChromaColor)Random.Range((int)ChromaColorInfo.First, (int)ChromaColorInfo.Last);
+        ChromaColor randColor = (ChromaColor)Random.Range((int)ChromaColorInfo.First, (int)ChromaColorInfo.Last + 1);
         enemy.GetComponent<EnemyHealth>().color = randColor;
         Material mat = enemyRedMaterial;
         switch(randColor)
