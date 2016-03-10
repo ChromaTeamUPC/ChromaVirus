@@ -1,31 +1,44 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class DebugStats : MonoBehaviour {
+public class DebugStats : MonoBehaviour
+{
 
     public DebugKeys keys;
 
     private int linePosition;
+    private int triangleCount;
 
     private string textFPS;
     private string textTriangles;
 
     private bool statsVisible = false;
-	
-	// Update is called once per frame
-	void Update () {
+    private bool calculateTriangles = false;
+
+    // Update is called once per frame
+    void Update()
+    {
         if (Input.GetKeyDown(keys.toggleStatsKey))
+        {
             statsVisible = !statsVisible;
+            if (statsVisible) calculateTriangles = true;
+        }
     }
 
     void OnGUI()
-    {     
+    {
+        if (calculateTriangles)
+        {
+            triangleCount = GetCurrentTriangleCount();
+            calculateTriangles = false;
+        }
+
         if (statsVisible)
         {
             linePosition = 0;
 
             textFPS = "Fps: " + GetCurrentFPS();
-            textTriangles = "Triangles in scene: " + GetCurrentTriangleCount();
+            textTriangles = "Triangles in scene: " + triangleCount;
 
             ShowStat(ref textFPS);
             ShowStat(ref textTriangles);

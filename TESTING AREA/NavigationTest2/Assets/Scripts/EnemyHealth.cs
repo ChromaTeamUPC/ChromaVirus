@@ -24,7 +24,7 @@ public class EnemyHealth : MonoBehaviour {
     void OnEnable()
     {
         currentHealth = maxHealthth;
-        voxelization.SetMaterial(color);
+        //voxelization.SetMaterial(color);
         mng.eventManager.TriggerEvent(EventManager.EventType.ENEMY_SPAWNED, new ColorEventInfo { newColor = color });
     }
 

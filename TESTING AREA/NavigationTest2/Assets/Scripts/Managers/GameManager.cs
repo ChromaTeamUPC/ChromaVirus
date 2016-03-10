@@ -31,6 +31,7 @@ public class GameManager : MonoBehaviour {
         mng.eventManager.StartListening(EventManager.EventType.PLAYER_SPAWNED, PlayerSpawned);
         mng.eventManager.StartListening(EventManager.EventType.PLAYER_DAMAGED, PlayerDamaged);
         mng.eventManager.StartListening(EventManager.EventType.PLAYER_DIED, PlayerDied);
+        mng.eventManager.StartListening(EventManager.EventType.COLOR_CHANGED, ColorChanged);
 
         player1Health = player1.GetComponent<PlayerHealth>();
         player1Shot = player1.GetComponent<PlayerShoot>();
@@ -39,6 +40,19 @@ public class GameManager : MonoBehaviour {
 
         //Test
         InvokeRepeating("SpawnEnemies", 2f, 3f);
+    }
+
+    //Test function
+    void ColorChanged(EventInfo eventInfo)
+    {
+        switch (((ColorEventInfo)eventInfo).newColor)
+        {
+            case ChromaColor.RED: RenderSettings.skybox.SetColor("_Tint", Color.red); break;
+            case ChromaColor.GREEN: RenderSettings.skybox.SetColor("_Tint", Color.green); break;
+            case ChromaColor.BLUE: RenderSettings.skybox.SetColor("_Tint", Color.blue); break;
+            case ChromaColor.YELLOW: RenderSettings.skybox.SetColor("_Tint", Color.yellow); break;
+        }
+        
     }
 
     void SpawnEnemies()
@@ -62,7 +76,8 @@ public class GameManager : MonoBehaviour {
             case ChromaColor.BLUE: mat = enemyBlueMaterial; break;
             case ChromaColor.YELLOW: mat = enemyYellowMaterial; break;
         }
-        enemy.GetComponent<Renderer>().material = mat;
+        //enemy.GetComponent<Renderer>().material = mat;
+        enemy.GetComponentInChildren<Renderer>().material = mat;
 
         //Activate enemy
         enemy.SetActive(true);

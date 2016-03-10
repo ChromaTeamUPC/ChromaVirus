@@ -25,7 +25,7 @@ public class ColorManager : MonoBehaviour {
     void Start () {
         currentColor = ChromaColor.RED;
         mng.eventManager.StartListening(EventManager.EventType.ENEMY_SPAWNED, EnemySpawned);
-        mng.eventManager.StartListening(EventManager.EventType.ENEMY_DIED, EnemyDied);
+        mng.eventManager.StartListening(EventManager.EventType.ENEMY_DIED, EnemyDied);      
     }
 
     public void EnemySpawned(EventInfo eventInfo)
