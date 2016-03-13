@@ -7,13 +7,6 @@ public class ShootMover : MonoBehaviour {
     public int damage;
     public ChromaColor color;
 
-    private ObjectPool shotPool;
-
-    void Start()
-    {
-        shotPool = mng.poolManager.shotPool;
-    }
-
 	// Use this for initialization
 	void OnEnable () {
         GetComponent<Rigidbody>().velocity = transform.forward * speed;
@@ -39,6 +32,6 @@ public class ShootMover : MonoBehaviour {
 
     void ReturnToPool()
     {
-        shotPool.AddObject(gameObject);
+        mng.poolManager.shotPool.AddObject(gameObject);
     }
 }

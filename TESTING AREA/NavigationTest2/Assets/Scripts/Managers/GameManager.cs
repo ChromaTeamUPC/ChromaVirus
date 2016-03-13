@@ -9,15 +9,11 @@ public class GameManager : MonoBehaviour {
     public Transform spawnPoint2;
     public Transform spawnPoint3;
 
-    public GameObject player1;
-    private PlayerHealth player1Health;
-    private PlayerShoot player1Shot;
+    public GameObject player1Prefab;
+    public GameObject player2Prefab;
 
-    public Text player1HealthTxt;
-    public Text player1EnergyTxt;
-
-    public Text win;
-    public Text gameOver;
+    public Transform player1SpawnPoint;
+    public Transform player2SpawnPoint; 
 
     public Material enemyRedMaterial;
     public Material enemyGreenMaterial;
@@ -25,19 +21,19 @@ public class GameManager : MonoBehaviour {
     public Material enemyYellowMaterial;
     private ObjectPool aracnoBotPool;
 
-
+    public GameObject player1;
+    public GameObject player2;
     // Use this for initialization
-    void Start () {
-        mng.eventManager.StartListening(EventManager.EventType.PLAYER_SPAWNED, PlayerSpawned);
-        mng.eventManager.StartListening(EventManager.EventType.PLAYER_DAMAGED, PlayerDamaged);
+    public void Init () {
         mng.eventManager.StartListening(EventManager.EventType.PLAYER_DIED, PlayerDied);
         mng.eventManager.StartListening(EventManager.EventType.COLOR_CHANGED, ColorChanged);
 
-        player1Health = player1.GetComponent<PlayerHealth>();
-        player1Shot = player1.GetComponent<PlayerShoot>();
+        aracnoBotPool = mng.poolManager.aracnoBotPool;      
+    }
 
-        aracnoBotPool = mng.poolManager.aracnoBotPool;
-
+    void Start()
+    {
+        player1 = Instantiate(player1Prefab, player1SpawnPoint.position, Quaternion.identity) as GameObject;
         //Test
         InvokeRepeating("SpawnEnemies", 2f, 3f);
     }
@@ -83,34 +79,15 @@ public class GameManager : MonoBehaviour {
         enemy.SetActive(true);
     }
 
-    void Update()
-    {
-        player1EnergyTxt.text = "Energy: " + (int)player1Shot.currentEnergy;
-
-    }
-
-
-    void PlayerSpawned(EventInfo eventInfo)
-    {
-        PlayerDamagedEventInfo info = (PlayerDamagedEventInfo)eventInfo;
-        player1HealthTxt.text = "Life: " + info.currentHealth;
-    }
-
-    void PlayerDamaged(EventInfo eventInfo)
-    {
-        PlayerDamagedEventInfo info = (PlayerDamagedEventInfo)eventInfo;
-        player1HealthTxt.text = "Life: " + info.currentHealth;
-    }
-
     public void PlayerDied(EventInfo eventInfo)
     {
-        gameOver.gameObject.SetActive(true);
+        //gameOver.gameObject.SetActive(true);
         StartCoroutine("GoToMainMenu");
     }
 
     public void PlayerWin()
     {
-        win.gameObject.SetActive(true);
+        //win.gameObject.SetActive(true);
         StartCoroutine("GoToCredits");
     }
 
