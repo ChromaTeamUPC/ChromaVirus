@@ -33,8 +33,9 @@ public class ColorManager : MonoBehaviour
     }
 
     // Use this for initialization
-    void Start () {
-        
+    void Start ()
+    {
+        mng.eventManager.TriggerEvent(EventManager.EventType.COLOR_CHANGED, new ColorEventInfo { newColor = currentColor });
     }
 
     public void EnemySpawned(EventInfo eventInfo)

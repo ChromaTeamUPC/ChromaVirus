@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviour {
     // Use this for initialization
     public void Init () {
         mng.eventManager.StartListening(EventManager.EventType.PLAYER_DIED, PlayerDied);
+        mng.eventManager.StartListening(EventManager.EventType.PLAYER_WIN, PlayerWin);
         mng.eventManager.StartListening(EventManager.EventType.COLOR_CHANGED, ColorChanged);
 
         aracnoBotPool = mng.poolManager.aracnoBotPool;      
@@ -81,13 +82,11 @@ public class GameManager : MonoBehaviour {
 
     public void PlayerDied(EventInfo eventInfo)
     {
-        //gameOver.gameObject.SetActive(true);
         StartCoroutine("GoToMainMenu");
     }
 
-    public void PlayerWin()
+    public void PlayerWin(EventInfo eventInfo)
     {
-        //win.gameObject.SetActive(true);
         StartCoroutine("GoToCredits");
     }
 

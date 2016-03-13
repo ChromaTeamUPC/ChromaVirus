@@ -20,7 +20,7 @@ public class ShootMover : MonoBehaviour {
             enemy.ImpactedByShot(color, damage);
         }
 
-        if (other.tag != "Player" && other.tag != "DestroyerBoundary")
+        if (other.tag != "Player" && other.tag != "DestroyerBoundary" && other.tag != "Elevator")
             ReturnToPool();
     }
 
