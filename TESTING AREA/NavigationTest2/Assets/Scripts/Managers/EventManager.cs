@@ -9,6 +9,11 @@ public class EventInfo
     public static EventInfo emptyInfo = new EventInfo();
 }
 
+public class PlayerSpawnedEventInfo : EventInfo
+{
+    public PlayerController player;
+}
+
 public class PlayerDamagedEventInfo : EventInfo
 {
     public int damage;
@@ -44,7 +49,7 @@ public class EventManager : MonoBehaviour {
 
     private Dictionary<EventType, CustomEvent> eventDictionary;
 
-    void Awake()
+    public void Init()
     {
         eventDictionary = new Dictionary<EventType, CustomEvent>();
     }

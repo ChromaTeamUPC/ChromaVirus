@@ -1,11 +1,14 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 
+//Helper class to know the first and last colors defined in the enumerator, so we can check for .First or .Last and always will return the proper color even if we reorder the enum
 public class ChromaColorInfo
 {
-    public static ChromaColor First = ChromaColor.RED;
-    public static ChromaColor Last = ChromaColor.YELLOW;
+    public static ChromaColor First = (ChromaColor)Enum.GetValues(typeof(ChromaColor)).GetValue(0);
+    public static ChromaColor Last = (ChromaColor)Enum.GetValues(typeof(ChromaColor)).GetValue(Enum.GetValues(typeof(ChromaColor)).Length - 1);
 }
+
 public enum ChromaColor
 {
     RED,
@@ -14,18 +17,24 @@ public enum ChromaColor
     YELLOW
 }
 
-public class ColorManager : MonoBehaviour {
+public class ColorManager : MonoBehaviour
+{
     public int changeInterval;
 
     private int[] colorCount = new int[] { 0, 0, 0, 0 };
     private ChromaColor currentColor;
     private int elapsedTime = 0;
 
-    // Use this for initialization
-    void Start () {
+    public void Init()
+    {
         currentColor = ChromaColor.RED;
         mng.eventManager.StartListening(EventManager.EventType.ENEMY_SPAWNED, EnemySpawned);
-        mng.eventManager.StartListening(EventManager.EventType.ENEMY_DIED, EnemyDied);      
+        mng.eventManager.StartListening(EventManager.EventType.ENEMY_DIED, EnemyDied);
+    }
+
+    // Use this for initialization
+    void Start () {
+        
     }
 
     public void EnemySpawned(EventInfo eventInfo)

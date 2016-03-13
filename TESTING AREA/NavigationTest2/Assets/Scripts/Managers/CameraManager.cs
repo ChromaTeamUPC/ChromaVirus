@@ -3,6 +3,9 @@ using System.Collections;
 
 public class CameraManager : MonoBehaviour {
 
+    [HideInInspector]
+    public Camera currentCamera;
+
     public GameObject mainCameraObj;
     public GameObject godCameraObj;
     public GameObject staticCamera1Obj;
@@ -10,6 +13,12 @@ public class CameraManager : MonoBehaviour {
     public GameObject staticCamera3Obj;
 
     public DebugKeys keys;
+
+    public void Init()
+    {
+        //Set main camera
+        currentCamera = mainCameraObj.GetComponent<Camera>();
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -34,26 +43,27 @@ public class CameraManager : MonoBehaviour {
         staticCamera2Obj.SetActive(false);
         staticCamera3Obj.SetActive(false);
 
-        GameObject camera = mainCameraObj;
+        GameObject cameraObj = mainCameraObj;
         //Find selected camera
         switch (cameraIndex)
         {
             case 1:
-                camera = godCameraObj;
+                cameraObj = godCameraObj;
                 break;
             case 2:
-                camera = staticCamera1Obj;
+                cameraObj = staticCamera1Obj;
                 break;
             case 3:
-                camera = staticCamera2Obj;
+                cameraObj = staticCamera2Obj;
                 break;
             case 4:
-                camera = staticCamera3Obj;
+                cameraObj = staticCamera3Obj;
                 break;
         }
 
         //Enable it and send event
-        camera.SetActive(true);
-        mng.eventManager.TriggerEvent(EventManager.EventType.CAMERA_CHANGED, new CameraEventInfo { newCamera = camera });
+        cameraObj.SetActive(true);
+        currentCamera = cameraObj.GetComponent<Camera>();
+        mng.eventManager.TriggerEvent(EventManager.EventType.CAMERA_CHANGED, new CameraEventInfo { newCamera = cameraObj });
     }
 }

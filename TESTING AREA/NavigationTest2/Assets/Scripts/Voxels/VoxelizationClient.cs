@@ -17,11 +17,10 @@ public class VoxelizationClient : MonoBehaviour {
     public Material yellowMaterial;
 
     private List<VoxelizationServer.AABCGrid> aABCGrids;
-    private ObjectPool voxelPool;
-    private GameObject voxel;
 
-
-
+    private ScriptObjectPool<VoxelController> voxelScriptPool;
+    private ObjectPool voxelColliderPool;
+    private VoxelController voxelController;
 
     //Precalculated variables (so calculation of grid will be faster on realtime)
     Material mat;
@@ -35,9 +34,14 @@ public class VoxelizationClient : MonoBehaviour {
     List<MeshFilter> meshFilters;
     List<Mesh> meshes;
 
+    Vector3 voxelScale;
+
     // Use this for initialization
     void Start () {
-        voxelPool = mng.poolManager.voxelPool;
+        //voxelPool = mng.poolManager.voxelPool;
+        voxelScriptPool = mng.poolManager.voxelControllerPool;
+        voxelColliderPool = mng.poolManager.voxelColliderPool;
+
         mat = redMaterial;
 
         if (!includeChildren)
@@ -57,6 +61,8 @@ public class VoxelizationClient : MonoBehaviour {
 
             PopulateLists(gameObject);
         }
+
+        voxelScale = new Vector3(voxelSideSize, voxelSideSize, voxelSideSize);
     }
 
     private void PopulateLists(GameObject gameObj)
@@ -153,6 +159,7 @@ public class VoxelizationClient : MonoBehaviour {
 
     public void SpawnVoxels()
     {
+        //int total = 0;
         if (aABCGrids != null)
         {
             foreach (VoxelizationServer.AABCGrid aABCGrid in aABCGrids)
@@ -167,13 +174,34 @@ public class VoxelizationClient : MonoBehaviour {
                             if (aABCGrid.IsAABCActiveUnsafe(x, y, z))
                             {
                                 Vector3 cubeCenter = aABCGrid.GetAABCCenterUnsafe(x, y, z) + preCalc;
-                                voxel = voxelPool.GetObject();
+                                /*voxel = voxelPool.GetObject();
                                 if (voxel != null)
                                 {
                                     voxel.transform.position = cubeCenter;
                                     voxel.transform.rotation = Quaternion.identity;
                                     voxel.GetComponent<Renderer>().material = mat;
                                     voxel.SetActive(true);
+                                }*/
+                                //++total;
+                                voxelController = voxelScriptPool.GetObject();
+                                if(voxelController != null)
+                                {
+                                    Transform voxelTrans = voxelController.gameObject.transform;
+                                    voxelTrans.position = cubeCenter;
+                                    //voxelTrans.rotation = Quaternion.identity;
+                                    voxelTrans.rotation = Random.rotation;
+                                    voxelTrans.localScale = voxelScale;
+                                    voxelController.GetComponent<Renderer>().material = mat;                                    
+                                    voxelController.gameObject.SetActive(true);
+                                    voxelController.spawnLevels = 1;
+                                }
+
+                                //Set a collider in place to make voxels "explode"
+                                GameObject voxelCollider = voxelColliderPool.GetObject();
+                                if (voxelCollider != null)
+                                {
+                                    voxelCollider.transform.position = cubeCenter;
+                                    voxelCollider.SetActive(true);
                                 }
                             }
                         }
@@ -181,5 +209,6 @@ public class VoxelizationClient : MonoBehaviour {
                 }
             }
         }
+        //Debug.Log("Spider spawned: " + total);
     }
 }
