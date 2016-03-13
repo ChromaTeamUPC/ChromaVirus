@@ -7,7 +7,7 @@ public class WinPoint : MonoBehaviour {
     {
         if(other.tag == "Player")
         {
-            mng.gameManager.PlayerWin();
+            mng.eventManager.TriggerEvent(EventManager.EventType.PLAYER_WIN, EventInfo.emptyInfo);
         }
     }
 }

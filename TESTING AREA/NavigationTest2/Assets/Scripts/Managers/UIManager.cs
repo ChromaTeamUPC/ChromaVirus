@@ -20,6 +20,8 @@ public class UIManager : MonoBehaviour
     public void Init ()
     {
         mng.eventManager.StartListening(EventManager.EventType.PLAYER_SPAWNED, PlayerSpawned);
+        mng.eventManager.StartListening(EventManager.EventType.PLAYER_DIED, PlayerDied);
+        mng.eventManager.StartListening(EventManager.EventType.PLAYER_WIN, PlayerWin);
     }
 
     void PlayerSpawned(EventInfo eventInfo)
@@ -56,5 +58,15 @@ public class UIManager : MonoBehaviour
             player2HealthTxt.text = "Life: " + player2.Health;
             player2EnergyTxt.text = "Energy: " + player2.Energy;
         }
+    }
+
+    public void PlayerDied(EventInfo eventInfo)
+    {
+        gameOver.gameObject.SetActive(true);
+    }
+
+    public void PlayerWin(EventInfo eventInfo)
+    {
+        win.gameObject.SetActive(true);
     }
 }

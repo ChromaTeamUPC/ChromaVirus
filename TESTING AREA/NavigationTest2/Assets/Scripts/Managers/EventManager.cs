@@ -41,6 +41,7 @@ public class EventManager : MonoBehaviour {
         PLAYER_SPAWNED,
         PLAYER_DAMAGED,
         PLAYER_DIED,
+        PLAYER_WIN,
         ENEMY_SPAWNED,
         ENEMY_DIED,
         COLOR_CHANGED,
