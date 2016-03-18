@@ -11,6 +11,7 @@ public class VoxelizationClient : MonoBehaviour {
     public bool includeChildren = true;
     public bool createMultipleGrids = false;
 
+    public bool randomMaterial = false;
     public Material redMaterial;
     public Material greenMaterial;
     public Material blueMaterial;
@@ -191,7 +192,15 @@ public class VoxelizationClient : MonoBehaviour {
                                     //voxelTrans.rotation = Quaternion.identity;
                                     voxelTrans.rotation = Random.rotation;
                                     voxelTrans.localScale = voxelScale;
-                                    voxelController.GetComponent<Renderer>().material = mat;                                    
+                                    if(!randomMaterial)
+                                    {
+                                        voxelController.GetComponent<Renderer>().material = mat;
+                                    }
+                                    else
+                                    {
+                                        voxelController.GetComponent<Renderer>().material = GetRandomMaterial();
+                                    }
+                                                                        
                                     voxelController.gameObject.SetActive(true);
                                     voxelController.spawnLevels = 1;
                                 }
@@ -210,5 +219,18 @@ public class VoxelizationClient : MonoBehaviour {
             }
         }
         //Debug.Log("Spider spawned: " + total);
+    }
+
+    private Material GetRandomMaterial()
+    {
+        switch(Random.Range((int)ChromaColorInfo.First, (int)ChromaColorInfo.Last + 1))
+        {
+            case (int)ChromaColor.RED: return redMaterial;
+            case (int)ChromaColor.GREEN: return greenMaterial;
+            case (int)ChromaColor.BLUE: return blueMaterial;
+            case (int)ChromaColor.YELLOW: return yellowMaterial;
+        }
+
+        return redMaterial;
     }
 }

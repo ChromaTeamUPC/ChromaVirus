@@ -6,6 +6,13 @@ public class MainMenuManager : MonoBehaviour {
 
     public GameObject help;
     private bool helpOpen = false;
+    private AsyncOperation loadLevel;
+
+    void Start()
+    {
+        loadLevel = SceneManager.LoadSceneAsync("MainScene");
+        loadLevel.allowSceneActivation = false;
+    }
 
     // Update is called once per frame
     void Update()
@@ -19,7 +26,8 @@ public class MainMenuManager : MonoBehaviour {
 
     public void OnClickStart()
     {
-        SceneManager.LoadScene("MainScene");
+        //SceneManager.LoadScene("MainScene");
+        loadLevel.allowSceneActivation = true;
     }
 
     public void OnClickHelp()

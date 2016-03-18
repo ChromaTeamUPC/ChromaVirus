@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
+using SynchronizerData;
 
 //Helper class to know the first and last colors defined in the enumerator, so we can check for .First or .Last and always will return the proper color even if we reorder the enum
 public class ChromaColorInfo
@@ -25,6 +26,10 @@ public class ColorManager : MonoBehaviour
     private ChromaColor currentColor;
     private int elapsedTime = 0;
 
+    private BeatObserver beatObserver;
+    private bool colorChange;
+
+
     public void Init()
     {
         currentColor = ChromaColor.RED;
@@ -32,9 +37,15 @@ public class ColorManager : MonoBehaviour
         mng.eventManager.StartListening(EventManager.EventType.ENEMY_DIED, EnemyDied);
     }
 
+    void Awake()
+    {
+        colorChange = true;
+        beatObserver = GetComponent<BeatObserver>();
+    }
+
     // Use this for initialization
     void Start ()
-    {
+    {        
         mng.eventManager.TriggerEvent(EventManager.EventType.COLOR_CHANGED, new ColorEventInfo { newColor = currentColor });
     }
 
@@ -57,9 +68,20 @@ public class ColorManager : MonoBehaviour
         if(elapsedTime >= changeInterval)
         {
             elapsedTime -= changeInterval;
-            SetNewColor();        
+            //SetNewColor();        
         }
 	}
+
+    void Update()
+    {
+        if ((beatObserver.beatMask & BeatType.DownBeat) == BeatType.DownBeat)
+        {
+            if(colorChange)
+                SetNewColor();
+
+            colorChange = !colorChange;
+        }
+    }
 
     private void SetNewColor()
     {

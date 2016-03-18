@@ -14,6 +14,11 @@ public class DebugKeys : MonoBehaviour {
     public KeyCode toggleWireframeKey;
     public KeyCode toggleGizmos;
 
+    public KeyCode toggleGrayScaleKey;
+    public KeyCode toggleNoiseKey;
+    public KeyCode toggleMusic;
+    public KeyCode playNoiseFx;
+
     //God camera control
     public KeyCode godCameraForward;
     public KeyCode godCameraBackward;

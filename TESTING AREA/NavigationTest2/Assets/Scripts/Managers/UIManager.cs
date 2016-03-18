@@ -6,6 +6,7 @@ public class UIManager : MonoBehaviour
 { 
     public Text player1HealthTxt;
     public Text player1EnergyTxt;
+    public Slider player1EnergySlider;
 
     public Text player2HealthTxt;
     public Text player2EnergyTxt; 
@@ -47,9 +48,10 @@ public class UIManager : MonoBehaviour
     void Update ()
     {
         if(player1 != null)
-        {
+        {     
             player1HealthTxt.text = "Life: " + player1.Health;
             player1EnergyTxt.text = "Energy: " + player1.Energy;
+            player1EnergySlider.value = player1.Energy;
         }
 
 

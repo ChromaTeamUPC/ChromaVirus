@@ -33,6 +33,7 @@ public class PlayerController : MonoBehaviour {
     private Rigidbody rigidBody;
     private Transform cameraTransform;
     private ShotManager shotManager;
+    private VoxelizationClient voxelization;
 
     //Properties
     public int Id { get { return playerId; } }
@@ -44,6 +45,7 @@ public class PlayerController : MonoBehaviour {
     void Awake()
     {
         rigidBody = GetComponent<Rigidbody>();
+        voxelization = GetComponent<VoxelizationClient>();
 
         //Temporary call
         InitPlayer(1);
@@ -90,6 +92,7 @@ public class PlayerController : MonoBehaviour {
         fire = player + "_Fire";
         dash = player + "_Dash";
 
+        gameObject.SetActive(true);
         mng.eventManager.TriggerEvent(EventManager.EventType.PLAYER_SPAWNED, new PlayerSpawnedEventInfo { player = this });
     }
 
@@ -175,7 +178,10 @@ public class PlayerController : MonoBehaviour {
 
         if (currentHealth == 0)
         {
-            mng.eventManager.TriggerEvent(EventManager.EventType.PLAYER_DIED, EventInfo.emptyInfo);
+            voxelization.CalculateVoxelsGrid();
+            voxelization.SpawnVoxels();
+            mng.eventManager.TriggerEvent(EventManager.EventType.PLAYER_DIED, new PlayerSpawnedEventInfo { player = this });
+            gameObject.SetActive(false);
         }
     }
 

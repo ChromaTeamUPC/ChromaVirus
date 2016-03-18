@@ -12,6 +12,7 @@ public class MainCameraScript : MonoBehaviour {
     void Start()
     {
         mng.eventManager.StartListening(EventManager.EventType.PLAYER_SPAWNED, PlayerSpawned);
+        mng.eventManager.StartListening(EventManager.EventType.PLAYER_DIED, PlayerDied);
     }
 
     public void PlayerSpawned(EventInfo eventInfo)
@@ -25,9 +26,20 @@ public class MainCameraScript : MonoBehaviour {
         }
         offset = transform.position - target1.position;
     }
-	
-	// Update is called once per frame
-	void FixedUpdate ()
+
+    public void PlayerDied(EventInfo eventInfo)
+    {
+        PlayerController playerController = ((PlayerSpawnedEventInfo)eventInfo).player;
+
+        switch (playerController.Id)
+        {
+            case 1: target1 = null; break;
+            case 2: target2 = null; break;
+        }
+    }
+
+    // Update is called once per frame
+    void FixedUpdate ()
     {
         if (target1 != null)
         {
