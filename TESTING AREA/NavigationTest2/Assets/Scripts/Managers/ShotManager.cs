@@ -47,7 +47,7 @@ public class ShotManager : MonoBehaviour {
 
         if (shot != null)
         {
-            shot.GetComponent<ShootMover>().color = currentColor;
+            shot.GetComponent<ShotMover>().color = currentColor;
             shot.GetComponent<Renderer>().material = currentMaterial;
         }
 

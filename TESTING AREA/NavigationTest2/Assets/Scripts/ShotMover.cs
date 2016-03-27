@@ -1,15 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ShootMover : MonoBehaviour {
+public class ShotMover : MonoBehaviour {
 
     public int speed;
     public int damage;
+    private int defaultDamage;
     public ChromaColor color;
 
 	// Use this for initialization
 	void OnEnable () {
         GetComponent<Rigidbody>().velocity = transform.forward * speed;
+        defaultDamage = damage;
     }
 
     void OnTriggerEnter(Collider other)
@@ -32,6 +34,7 @@ public class ShootMover : MonoBehaviour {
 
     void ReturnToPool()
     {
+        damage = defaultDamage;
         mng.poolManager.shotPool.AddObject(gameObject);
     }
 }

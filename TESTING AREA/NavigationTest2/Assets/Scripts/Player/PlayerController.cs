@@ -35,6 +35,16 @@ public class PlayerController : MonoBehaviour {
     private ShotManager shotManager;
     private VoxelizationClient voxelization;
 
+    private bool isFirstShot = true;
+
+    const float maxSideOffset = 0.4f;
+    const float minSideOffset = 0.2f;
+    private float shotSideOffset = minSideOffset;
+    private float sideOffsetVariation = -0.05f;
+
+    public Light shotLight;
+
+
     //Properties
     public int Id { get { return playerId; } }
     public int Lives {  get { return currentLives; } }
@@ -143,21 +153,58 @@ public class PlayerController : MonoBehaviour {
 
     private void Shoot()
     {
-        if (Input.GetAxisRaw(fire) > 0.5f && Time.time > nextFire && currentEnergy >= energyLostPerShot)
+        shotLight.enabled = false;
+
+        if (Input.GetAxisRaw(fire) > 0.1f && Time.time > nextFire && currentEnergy >= energyLostPerShot)
         {
             nextFire = Time.time + fireRate;
+            shotLight.enabled = true;
 
-            //Get a shot from pool
-            GameObject shot = shotManager.GetShot();
-
-            if (shot != null)
+            // check if it's first shot (single projectile)...
+            if (isFirstShot)
             {
-                shot.transform.position = shotSpawn.position;
-                shot.transform.rotation = shotSpawn.rotation;
-                shot.SetActive(true);
-            }
+                //Get a shot from pool
+                GameObject shot = shotManager.GetShot();
+                shot.GetComponent<ShotMover>().damage *= 2;
 
+                if (shot != null)
+                {
+                    shot.transform.position = shotSpawn.position;
+                    shot.transform.rotation = shotSpawn.rotation;
+                    shot.SetActive(true);
+                }
+                isFirstShot = false;
+            }
+            // ...or not (double projectile)
+            else
+            {
+                //Get two shots from pool
+                GameObject shot1 = shotManager.GetShot();
+                GameObject shot2 = shotManager.GetShot();
+
+                if (shot1 != null && shot2 != null)
+                {
+                    shot1.transform.rotation = shotSpawn.rotation;
+                    shot1.transform.position = shotSpawn.position;
+                    shot1.transform.Translate(new Vector3(shotSideOffset, 0, 0));
+                    shot1.SetActive(true);
+
+                    shot2.transform.rotation = shotSpawn.rotation;
+                    shot2.transform.position = shotSpawn.position;
+                    shot2.transform.Translate(new Vector3(-shotSideOffset, 0, 0));
+                    shot2.SetActive(true);
+
+                    if (shotSideOffset <= minSideOffset || shotSideOffset >= maxSideOffset)
+                        sideOffsetVariation *= -1;
+
+                    shotSideOffset += sideOffsetVariation;
+                }
+            }
             currentEnergy -= energyLostPerShot;
+        }
+        else if (Input.GetAxisRaw(fire) <= 0.1f)
+        {
+            isFirstShot = true;
         }
 
         if (currentEnergy < maxEnergy)
