@@ -1,0 +1,16 @@
+# 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
+# File Created: 07.04.2016 10:24:53
+
+newmtl 01___Default
+	Ns 9.999999
+	Ni 1.500000
+	d 1.000000
+	Tr 0.000000
+	Tf 1.000000 1.000000 1.000000 
+	illum 2
+	Ka 0.098039 0.098039 0.098039
+	Kd 0.098039 0.098039 0.098039
+	Ks 0.000000 0.000000 0.000000
+	Ke 0.000000 0.000000 0.000000
+	map_Ka C:\Users\Eve\Desktop\ChromaVirus\Models\PROPS\LATERALES\CHIP_UVT.png
+	map_Kd C:\Users\Eve\Desktop\ChromaVirus\Models\PROPS\LATERALES\CHIP_UVT.png
