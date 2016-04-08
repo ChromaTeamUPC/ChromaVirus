@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour {
     public int maxHealth = 100;
 
     public float speed = 10;
+    public float moveThreshold = 0.2f;
     public float angularSpeed = 360;
     public float aimThreshold = 0.2f;
 
@@ -31,19 +32,22 @@ public class PlayerController : MonoBehaviour {
     private string dash;
 
     private Rigidbody rigidBody;
-    private Transform cameraTransform;
+    private Camera currentCamera;
+    private MainCameraScript mainCameraScript;
     private ShotManager shotManager;
     private VoxelizationClient voxelization;
 
     private bool isFirstShot = true;
 
-    const float maxSideOffset = 0.4f;
-    const float minSideOffset = 0.2f;
+    private const float maxSideOffset = 0.4f;
+    private const float minSideOffset = 0.2f;
     private float shotSideOffset = minSideOffset;
     private float sideOffsetVariation = -0.05f;
 
     public Light shotLight;
 
+    private int playerRayCastMask;
+    private float camRayLength = 100f;
 
     //Properties
     public int Id { get { return playerId; } }
@@ -54,16 +58,15 @@ public class PlayerController : MonoBehaviour {
     //Unity methods
     void Awake()
     {
+        playerRayCastMask = LayerMask.GetMask("PlayerRayCast");
         rigidBody = GetComponent<Rigidbody>();
         voxelization = GetComponent<VoxelizationClient>();
-
-        //Temporary call
-        InitPlayer(1);
     }
 
     void Start ()
     {
-        cameraTransform = mng.cameraManager.currentCamera.transform;
+        currentCamera = mng.cameraManager.currentCamera;
+        mainCameraScript = currentCamera.GetComponent<MainCameraScript>();
         shotManager = mng.shotManager;
         mng.eventManager.StartListening(EventManager.EventType.CAMERA_CHANGED, CameraChanged);
     }
@@ -78,15 +81,15 @@ public class PlayerController : MonoBehaviour {
     //Custom methods
     public void CameraChanged(EventInfo eventInfo)
     {
-        CameraEventInfo info = (CameraEventInfo)eventInfo;
-        cameraTransform = info.newCamera.transform;
+        currentCamera = ((CameraEventInfo)eventInfo).newCamera;
+        mainCameraScript = currentCamera.GetComponent<MainCameraScript>();
     }
 
     public void InitPlayer(int playerNumber)
     {
         playerId = playerNumber;
         currentLives = maxLives;
-        ResetPlayer();
+
 
         string player = "";
         switch(playerId)
@@ -102,6 +105,7 @@ public class PlayerController : MonoBehaviour {
         fire = player + "_Fire";
         dash = player + "_Dash";
 
+        ResetPlayer();
         gameObject.SetActive(true);
         mng.eventManager.TriggerEvent(EventManager.EventType.PLAYER_SPAWNED, new PlayerSpawnedEventInfo { player = this });
     }
@@ -115,18 +119,50 @@ public class PlayerController : MonoBehaviour {
     private void Move()
     {
         float h = Input.GetAxisRaw(moveHorizontal);
-        float v = Input.GetAxisRaw(moveVertical);
+        float v = Input.GetAxisRaw(moveVertical);       
 
-        Vector3 displacement = new Vector3(h, 0f, v);
+        if (Mathf.Abs(v) > 0 || Mathf.Abs(h) > 0)
+        {
+            Vector3 directionVector = new Vector3(h, v, 0);
+            float magnitude = directionVector.magnitude;
+            directionVector = directionVector * 100;
+            Vector3 playerScreenPos = currentCamera.WorldToScreenPoint(transform.position);
 
-        //Get the Y rotation angle from the camera
-        float camRotation = cameraTransform.rotation.eulerAngles.y;
-        //Apply that rotation to the direction vector
-        displacement = Quaternion.Euler(0, camRotation, 0) * displacement;
+            Vector3 destinationPos;
+            if (mainCameraScript != null)
+                destinationPos = mainCameraScript.GetPosition(playerScreenPos, directionVector);
+            else
+                destinationPos = playerScreenPos + directionVector;
 
-        //Add velocity and apply it
-        displacement = displacement * speed * Time.deltaTime;
-        rigidBody.MovePosition(rigidBody.position + displacement);
+            Ray camRay = currentCamera.ScreenPointToRay(destinationPos);
+            RaycastHit playerRaycastHit;
+
+            if (Physics.Raycast(camRay, out playerRaycastHit, camRayLength, playerRayCastMask))
+            {
+                Vector3 playerGoToMax = playerRaycastHit.point - transform.position;
+                playerGoToMax.y = 0f;
+
+                Vector3 playerGoTo = playerGoToMax;          
+                playerGoTo.Normalize();
+                playerGoTo = playerGoTo * magnitude * speed * Time.deltaTime;
+
+                Vector3 newPosition = rigidBody.position + playerGoTo;
+                if (playerGoToMax.sqrMagnitude < playerGoTo.sqrMagnitude)
+                    newPosition = rigidBody.position + playerGoToMax;           
+
+                rigidBody.MovePosition(newPosition);
+
+                //If we are not aiming, rotate towards direction
+                float ah = Input.GetAxisRaw(aimHorizontal);
+                float av = Input.GetAxisRaw(aimVertical);
+                if (Mathf.Abs(av) < aimThreshold && Mathf.Abs(ah) < aimThreshold)
+                {
+                    Quaternion newRotation = Quaternion.LookRotation(playerGoTo);
+                    newRotation = Quaternion.RotateTowards(rigidBody.rotation, newRotation, angularSpeed * Time.deltaTime);
+                    rigidBody.MoveRotation(newRotation);
+                }
+            }
+        }
     }
 
     private void Turn()
@@ -135,19 +171,23 @@ public class PlayerController : MonoBehaviour {
         float v = Input.GetAxisRaw(aimVertical);
 
         if (Mathf.Abs(v) >= aimThreshold || Mathf.Abs(h) >= aimThreshold)
-        {
-            Vector3 lookAt = new Vector3(h, 0, v);
+        {           
+            Vector3 directionVector = new Vector3(h, v, 0) * 100;
+            Vector3 playerScreenPos = currentCamera.WorldToScreenPoint(transform.position);
+            directionVector = playerScreenPos + directionVector;
 
-            //Get the Y rotation angle from the camera
-            float camRotation = cameraTransform.rotation.eulerAngles.y;
-            //Apply that rotation to the direction vector
-            lookAt = Quaternion.Euler(0, camRotation, 0) * lookAt;
+            Ray camRay = currentCamera.ScreenPointToRay(directionVector);
+            RaycastHit playerRaycastHit;
 
-            //Get the smoothed rotation quaternion
-            Quaternion rotation = Quaternion.LookRotation(lookAt, Vector3.up);
-            rotation = Quaternion.RotateTowards(rigidBody.rotation, rotation, angularSpeed * Time.deltaTime);
-            //Apply it to rigidbody
-            rigidBody.MoveRotation(rotation);
+            if (Physics.Raycast(camRay, out playerRaycastHit, camRayLength, playerRayCastMask))
+            {
+                Vector3 playerLookAt = playerRaycastHit.point - transform.position;
+                playerLookAt.y = 0f;
+
+                Quaternion newRotation = Quaternion.LookRotation(playerLookAt);
+                newRotation = Quaternion.RotateTowards(rigidBody.rotation, newRotation, angularSpeed * Time.deltaTime);
+                rigidBody.MoveRotation(newRotation);
+            }          
         }
     }
 

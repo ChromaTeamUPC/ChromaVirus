@@ -27,7 +27,7 @@ public class ColorEventInfo : EventInfo
 
 public class CameraEventInfo : EventInfo
 {
-    public GameObject newCamera;
+    public Camera newCamera;
 }
 
 [System.Serializable]

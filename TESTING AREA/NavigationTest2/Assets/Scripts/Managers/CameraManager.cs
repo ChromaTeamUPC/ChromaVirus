@@ -32,6 +32,8 @@ public class CameraManager : MonoBehaviour {
             ChangeCamera(3);
         else if (Input.GetKeyDown(keys.staticCamera3ActivationKey))
             ChangeCamera(4);
+        else if (Input.GetKeyDown(keys.mainCameraFollowPlayersKey))
+            ToggleCameraFollowPlayers();
     }
 
     void ChangeCamera(int cameraIndex)
@@ -64,6 +66,12 @@ public class CameraManager : MonoBehaviour {
         //Enable it and send event
         cameraObj.SetActive(true);
         currentCamera = cameraObj.GetComponent<Camera>();
-        mng.eventManager.TriggerEvent(EventManager.EventType.CAMERA_CHANGED, new CameraEventInfo { newCamera = cameraObj });
+        mng.eventManager.TriggerEvent(EventManager.EventType.CAMERA_CHANGED, new CameraEventInfo { newCamera = currentCamera });
+    }
+
+    void ToggleCameraFollowPlayers()
+    {
+        MainCameraScript script = mainCameraObj.GetComponent<MainCameraScript>();
+        script.enabled = !script.enabled;
     }
 }

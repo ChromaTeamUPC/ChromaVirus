@@ -22,7 +22,9 @@ public class GameManager : MonoBehaviour {
     private ObjectPool aracnoBotPool;
 
     public GameObject player1;
+    public PlayerController player1Controller;
     public GameObject player2;
+    public PlayerController player2Controller;
     // Use this for initialization
     public void Init () {
         mng.eventManager.StartListening(EventManager.EventType.PLAYER_DIED, PlayerDied);
@@ -35,8 +37,14 @@ public class GameManager : MonoBehaviour {
     void Start()
     {
         player1 = Instantiate(player1Prefab, player1SpawnPoint.position, Quaternion.identity) as GameObject;
+        player1Controller = player1.GetComponent<PlayerController>();
+        player1Controller.InitPlayer(1);
+
+        /*player2 = Instantiate(player1Prefab, player2SpawnPoint.position, Quaternion.identity) as GameObject;
+        player2Controller = player2.GetComponent<PlayerController>();
+        player2Controller.InitPlayer(2);*/
         //Test
-        InvokeRepeating("SpawnEnemies", 2f, 3f);
+        //InvokeRepeating("SpawnEnemies", 2f, 3f);
     }
 
     //Test function
