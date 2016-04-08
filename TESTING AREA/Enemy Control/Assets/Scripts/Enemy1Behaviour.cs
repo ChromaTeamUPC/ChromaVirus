@@ -12,43 +12,68 @@ public class Enemy1Behaviour : MonoBehaviour {
     private int currentAction = 0;
     private NavMeshAgent agent;
     private bool actionStarted = false;
+    private int floorMask;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        floorMask = LayerMask.GetMask("Floor");
 
-        actionList.Add(new Action(Action.Type.MOVE, wp1.position, 15.0f));
-        actionList.Add(new Action(Action.Type.MOVE, wp2.position, 5.0f));
-        actionList.Add(new Action(Action.Type.MOVE, wp3.position, 5.0f, 0));
+        actionList.Add(new Action(Action.Type.MOVE, Action.OffsetType.POSITION_ZERO, "wp1"));
+        //actionList.Add(new Action(Action.Type.MOVE, Action.wpType.ABSOLUTE, "wp2"));
+        actionList.Add(new Action(Action.Type.MOVE, Action.OffsetType.AROUND, "Player", 90, 3.0f));
+        actionList.Add(new Action(Action.Type.MOVE, Action.OffsetType.POSITION_ZERO, "wp3", 0));
     }
     
     void Update()
     {
         if (currentAction <= actionList.Count)
         {
-            if (actionList[currentAction].name == Action.Type.MOVE)
+            Action action = actionList[currentAction];  // for readibility
+
+            if (action.actionType == Action.Type.MOVE)
             {
-                if (!actionStarted)
+                if (!actionStarted) // this is less frequent, will change to "else" instead
                 {
-                    agent.destination = actionList[currentAction].waypoint;
-                    agent.speed = actionList[currentAction].speed;
+                    Vector3 tgtPosition = GameObject.Find(action.targetID).transform.position;
+
+                    if (action.offsetType == Action.OffsetType.POSITION_ZERO)
+                        agent.destination = tgtPosition;
+                    else if (action.offsetType == Action.OffsetType.AROUND)
+                    {
+                        Vector3 offsetPosition = Camera.main.WorldToScreenPoint(tgtPosition);
+                        offsetPosition.x += 10;
+
+                        Ray camRay = Camera.main.ScreenPointToRay(offsetPosition);
+                        RaycastHit raycastHit;
+
+                        if (Physics.Raycast(camRay, out raycastHit, 100, floorMask))
+                        {
+                            Vector3 offsetVector = (offsetPosition - raycastHit.point);
+                            offsetVector = offsetVector.normalized;
+                            offsetVector *= action.distance;
+                            
+                            offsetPosition += offsetVector;
+                            agent.destination = offsetPosition;
+                        }
+
+                    }
+
+                    agent.speed = action.speed;
                     actionStarted = true;
                 }
                 else
                 {
                     if (agent.remainingDistance <= 0.5)
                     {
-                        if (actionList[currentAction].nextAction == Action.NEXT_ACTION)
+                        if (action.nextAction == Action.NEXT_ACTION)
                             currentAction++;
                         else
-                            currentAction = actionList[currentAction].nextAction;
+                            currentAction = action.nextAction;
 
                         actionStarted = false;
                     }
                 }
-                
-
-                //agent.destination = actionList[currentAction].waypoint;
             }
         }
     }

@@ -11,16 +11,29 @@ public class Action
         ATTACK
     }
 
-    public Action(Type n, Vector3 w, float s = 4.0f, int na = NEXT_ACTION)
+    public enum OffsetType
     {
-        name = n;
-        waypoint = w;
+        POSITION_ZERO,      // same coordinates as the waypoint
+        AROUND              // around the target, at some degrees and distance
+    }
+
+    public Action(Type at, OffsetType off, string id, int an = 0, float dst = 0, float s = 4.0f, int na = NEXT_ACTION)
+    {
+        actionType = at;
+        offsetType = off;
+        targetID = id;
+        angle = an;
+        distance = dst;
         speed = s;
         nextAction = na;
     }
 
-    public Type name;
-    public Vector3 waypoint;
+    public Type actionType;
+    public OffsetType offsetType;
+    public Vector3 waypoint;        // provisional
+    public string targetID;         // an ID for an absolute waypoint
     public int nextAction;
     public float speed;
+    public int angle;
+    public float distance;
 }
