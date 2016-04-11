@@ -4,12 +4,28 @@ using System.Collections;
 
 public class EnemyManager : MonoBehaviour {
 
-    private List<Action> test1 = new List<Action>();
+    public GameObject player;
+    private List<Action> defaultList = new List<Action>();
+    private List<Action> closeList = new List<Action>();
+    public SpiderAIBehaviour enemy;
 
     void Awake()
     {
-        test1.Add(new Action(Action.Type.MOVE, Action.OffsetType.POSITION_ZERO, "wp1"));
-        test1.Add(new Action(Action.Type.MOVE, Action.OffsetType.AROUND, "Player", 90, 5.0f, Action.FocusType.CONTINUOUS));
-        test1.Add(new Action(Action.Type.MOVE, Action.OffsetType.POSITION_ZERO, "wp3", 0, 0, Action.FocusType.FIXED, 4.0f, 0));
+        defaultList.Add(new MoveAction("wp1"));
+        defaultList.Add(new SelectTargetAction("player"));
+        defaultList.Add(new MoveAction("player", 4.0f, Action.FocusType.CONTINUOUS, Action.OffsetType.AROUND,  90, 5.0f));
+        defaultList.Add(new MoveAction("wp3", 4.0f, Action.FocusType.FIXED, Action.OffsetType.POSITION_ZERO));
+
+        closeList.Add(new MoveAction("wp2", 10f, Action.LIST_FINISHED));
+    }
+
+    void Start()
+    {
+        enemy.AIInit(defaultList, closeList, null);
+    }
+
+    public GameObject SelectTarget()
+    {
+        return player;
     }
 }

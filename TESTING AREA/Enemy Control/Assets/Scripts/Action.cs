@@ -4,13 +4,8 @@ using System.Collections;
 public class Action
 {
     public const int NEXT_ACTION = -1;
-    public const int NOT_FINISHED = -2;
-
-    public enum Type
-    {
-        MOVE,
-        ATTACK
-    }
+    public const int ACTION_NOT_FINISHED = -2;
+    public const int LIST_FINISHED = -3;
 
     public enum OffsetType
     {
@@ -24,24 +19,56 @@ public class Action
         CONTINUOUS          // the waypoint calculation is refreshed every frame
     }
 
-    public Action(Type at, OffsetType off, string id, int an = 0, float dst = 0, FocusType ft = FocusType.FIXED, float s = 4.0f, int na = NEXT_ACTION)
+    public enum Type
     {
-        actionType = at;
-        offsetType = off;
-        targetID = id;
-        angle = an;
-        distance = dst;
-        speed = s;
-        nextAction = na;
-        focusType = ft;
+        NONE,
+        SELECT_TARGET,
+        MOVE,
+        ATTACK
     }
 
     public Type actionType;
+    public int nextAction;
+
+    public Action(int next)
+    {
+        actionType = Type.NONE;
+        nextAction = next;
+    }
+}
+
+public class SelectTargetAction: Action
+{
+    public string targetId; //TO REFACTOR: Not sure if needed
+
+    public SelectTargetAction(string target, int next = Action.NEXT_ACTION): base(next)
+    {
+        actionType = Type.SELECT_TARGET;
+        targetId = target;
+    }
+}
+
+public class MoveAction: Action
+{
+    public string targetId;
+    public float speed;
+    public FocusType focusType;
     public OffsetType offsetType;
-    public string targetID;         // an ID for an absolute waypoint
-    public int nextAction;   
     public int angle;
     public float distance;
-    public FocusType focusType;
-    public float speed;
+    
+    public MoveAction(string target, float sp = 4f, int next = Action.NEXT_ACTION) : this(target, sp, FocusType.FIXED, OffsetType.POSITION_ZERO, 0, 0, next)
+    {  
+    }
+
+    public MoveAction(string target, float sp, FocusType focusT, OffsetType offsetT, int ang = 0, float dist = 0f, int next = Action.NEXT_ACTION) : base(next)
+    {
+        actionType = Type.MOVE;
+        targetId = target;
+        speed = sp;
+        focusType = focusT;
+        offsetType = offsetT;
+        angle = ang;
+        distance = dist;
+    }
 }
