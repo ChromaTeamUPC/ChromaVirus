@@ -1,4 +1,4 @@
-Chroma Team
+﻿Chroma Team
 
 Project Manager
 Jordi Simon Urbano
@@ -7,21 +7,21 @@ Lead Game Designer
 Jordi Cano Diaz
 
 Additional Game Designer
-Joan Surís Valls
+Joan Suris Valls
 
 2D Lead Artist
-Evelyn Rodríguez Bermúdez
+EVELYN RODRIGUEZ BERMUDEZ
 
 2D Artists
-Evelyn Rodríguez Bermúdez
-Joan Surís Valls
+Evelyn Rodriguez Bermudez
+Joan Suris Valls
 
 3D Lead Artist
-Joan Surís Valls
+Joan Suris Valls
 
 3D Artists
-Joan Surís Valls
-Evelyn Rodríguez Bermúdez
+Joan Suris Valls
+Evelyn Rodriguez Bermudez
 
 Lead Programmer
 Jordi Simon Urbano

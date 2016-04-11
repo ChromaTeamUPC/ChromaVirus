@@ -21,8 +21,7 @@ public class ShotMover : MonoBehaviour {
             EnemyHealth enemy = other.GetComponent<EnemyHealth>();
             enemy.ImpactedByShot(color, damage);
         }
-
-        if (other.tag != "Player" && other.tag != "DestroyerBoundary" && other.tag != "Elevator")
+        else if (other.tag != "Player1" && other.tag != "Player2" && other.tag != "DestroyerBoundary" && other.tag != "Elevator")
             ReturnToPool();
     }
 

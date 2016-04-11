@@ -37,14 +37,20 @@ public class GameManager : MonoBehaviour {
     void Start()
     {
         player1 = Instantiate(player1Prefab, player1SpawnPoint.position, Quaternion.identity) as GameObject;
+        player1.tag = "Player1";
         player1Controller = player1.GetComponent<PlayerController>();
         player1Controller.InitPlayer(1);
 
-        /*player2 = Instantiate(player1Prefab, player2SpawnPoint.position, Quaternion.identity) as GameObject;
+        player2 = Instantiate(player2Prefab, player2SpawnPoint.position, Quaternion.identity) as GameObject;
+        player2.tag = "Player2";
         player2Controller = player2.GetComponent<PlayerController>();
-        player2Controller.InitPlayer(2);*/
+        player2Controller.InitPlayer(2);
         //Test
         //InvokeRepeating("SpawnEnemies", 2f, 3f);
+        StartCoroutine(SpawnEnemies(spawnPoint1.transform.position, 2f, 3f));
+        StartCoroutine(SpawnEnemies(spawnPoint2.transform.position, 6f, 2f));
+
+        Debug.Log(StaticVarsTest.foo);
     }
 
     //Test function
@@ -60,32 +66,40 @@ public class GameManager : MonoBehaviour {
         
     }
 
-    void SpawnEnemies()
+    IEnumerator SpawnEnemies(Vector3 position, float initialDelay, float repeatRate)
     {
-        //Get enemy from pool
-        GameObject enemy = aracnoBotPool.GetObject();
-        //Set objective goal
-        EnemyMovement eMov = enemy.GetComponent<EnemyMovement>();
-        eMov.goal = player1.transform;
+        yield return new WaitForSeconds(initialDelay);
 
-        //Set spawnpoint
-        enemy.transform.position = spawnPoint1.transform.position;
-        
-        ChromaColor randColor = (ChromaColor)Random.Range((int)ChromaColorInfo.First, (int)ChromaColorInfo.Last + 1);
-        enemy.GetComponent<EnemyHealth>().color = randColor;
-        Material mat = enemyRedMaterial;
-        switch(randColor)
+        while (true)
         {
-            case ChromaColor.RED: mat = enemyRedMaterial; break;
-            case ChromaColor.GREEN: mat = enemyGreenMaterial; break;
-            case ChromaColor.BLUE: mat = enemyBlueMaterial; break;
-            case ChromaColor.YELLOW: mat = enemyYellowMaterial; break;
-        }
-        //enemy.GetComponent<Renderer>().material = mat;
-        enemy.GetComponentInChildren<Renderer>().material = mat;
+            //Get enemy from pool
+            GameObject enemy = aracnoBotPool.GetObject();
+            //Set objective goal
+            EnemyMovement eMov = enemy.GetComponent<EnemyMovement>();
+            eMov.goal = player1.transform;
 
-        //Activate enemy
-        enemy.SetActive(true);
+            //Set spawnpoint
+            //enemy.transform.position = spawnPoint1.transform.position;
+            enemy.transform.position = position;
+
+            ChromaColor randColor = (ChromaColor)Random.Range((int)ChromaColorInfo.First, (int)ChromaColorInfo.Last + 1);
+            enemy.GetComponent<EnemyHealth>().color = randColor;
+            Material mat = enemyRedMaterial;
+            switch (randColor)
+            {
+                case ChromaColor.RED: mat = enemyRedMaterial; break;
+                case ChromaColor.GREEN: mat = enemyGreenMaterial; break;
+                case ChromaColor.BLUE: mat = enemyBlueMaterial; break;
+                case ChromaColor.YELLOW: mat = enemyYellowMaterial; break;
+            }
+            //enemy.GetComponent<Renderer>().material = mat;
+            enemy.GetComponentInChildren<Renderer>().material = mat;
+
+            //Activate enemy
+            enemy.SetActive(true);
+
+            yield return new WaitForSeconds(repeatRate);
+        }
     }
 
     public void PlayerDied(EventInfo eventInfo)

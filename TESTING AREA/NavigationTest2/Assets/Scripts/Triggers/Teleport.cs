@@ -7,7 +7,7 @@ public class Teleport : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other)
     {
-        if (other.tag == "Player")
+        if (other.tag == "Player1" || other.tag == "Player2")
         {
             other.transform.position = teleportDestination.position;
         }

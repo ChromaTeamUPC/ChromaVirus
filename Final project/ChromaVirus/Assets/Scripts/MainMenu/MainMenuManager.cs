@@ -10,9 +10,8 @@ public class MainMenuManager : MonoBehaviour {
 
     void Start()
     {
-        loadLevel = SceneManager.LoadSceneAsync("MainScene");
+        loadLevel = SceneManager.LoadSceneAsync("Level01");
         loadLevel.allowSceneActivation = false;
-        StaticVarsTest.foo = 1;
     }
 
     // Update is called once per frame
@@ -27,7 +26,7 @@ public class MainMenuManager : MonoBehaviour {
 
     public void OnClickStart()
     {
-        //SceneManager.LoadScene("MainScene");
+        //TODO: Select players
         loadLevel.allowSceneActivation = true;
     }
 
@@ -39,7 +38,7 @@ public class MainMenuManager : MonoBehaviour {
 
     public void OnClickCredits()
     {
-        SceneManager.LoadScene("GameCredits");
+        SceneManager.LoadScene("Credits");
     }
 
     public void OnClickExit()
