@@ -3,6 +3,15 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 
 public class CreditsController : MonoBehaviour {
+    private enum CreditsState
+    {
+        FadingIn,
+        WaitingTitle,
+        Crawling,
+        WaitingCopyRight,
+        FadingOut
+    }
+    private CreditsState currentState;
 
     public FadeSceneScript fadeScript;
 
@@ -15,17 +24,6 @@ public class CreditsController : MonoBehaviour {
 
     private float volumeFadeTime;
     private float waitingTime;
-
-    private enum CreditsState
-    {
-        FadingIn,
-        WaitingTitle,
-        Crawling,
-        WaitingCopyRight,
-        FadingOut
-    }
-
-    private CreditsState currentState;
 
 	// Use this for initialization
 	void Start ()
