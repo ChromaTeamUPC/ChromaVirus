@@ -11,7 +11,7 @@ public class SpiderAIBehaviour : MonoBehaviour
     private AIBaseState attackChipState;
 
     //Test, remove
-    private bool done = false;
+    private bool done = true;
     private float time;
 
 	// Use this for initialization

@@ -5,27 +5,138 @@ using System.Collections;
 public class EnemyManager : MonoBehaviour {
 
     public GameObject player;
-    private List<Action> defaultList = new List<Action>();
-    private List<Action> closeList = new List<Action>();
+    private static List<Action> level01spiderDefault01 = new List<Action>();
+    private static List<Action> closeList = new List<Action>();
+    private static bool listsInit = false;
     public SpiderAIBehaviour enemy;
+
+    //Plan zone
+    private static ZonePlan plan0101;
+    //...
+
+    private ZonePlan currentPlan;
+    public int enemies;
+    private int spawners;
+    private int turrets;
+    private int executingWaves;
 
     void Awake()
     {
-        defaultList.Add(new MoveAction("wp1"));
-        defaultList.Add(new SelectTargetAction("player"));
-        defaultList.Add(new MoveAction("player", 4.0f, Action.FocusType.CONTINUOUS, Action.OffsetType.AROUND,  90, 5.0f));
-        defaultList.Add(new MoveAction("wp3", 4.0f, Action.FocusType.FIXED, Action.OffsetType.POSITION_ZERO));
+        if (!listsInit)
+        {
+            //Init behaviour actions lists
+            level01spiderDefault01.Add(new MoveAction("wp1"));
+            level01spiderDefault01.Add(new SelectTargetAction("player"));
+            level01spiderDefault01.Add(new MoveAction("player", 4.0f, Action.FocusType.CONTINUOUS, Action.OffsetType.POSITION_ZERO));
+            level01spiderDefault01.Add(new MoveAction("wp3", 4.0f, Action.FocusType.FIXED, Action.OffsetType.POSITION_ZERO));
 
-        closeList.Add(new MoveAction("wp2", 10f, Action.LIST_FINISHED));
+            closeList.Add(new MoveAction("wp2", 10f, Action.LIST_FINISHED));
+
+
+            //Init zone plans
+            //plan0101
+            plan0101 = new ZonePlan();
+            List<WaveAction> wave01 = new List<WaveAction>();
+            wave01.Add(new SpawnSpiderWaveAction(GameObject.Find("wp1").transform, level01spiderDefault01, closeList, null));
+            wave01.Add(new SpawnSpiderWaveAction(GameObject.Find("wp1").transform, level01spiderDefault01, closeList, null, 3f));
+            wave01.Add(new SpawnSpiderWaveAction(GameObject.Find("wp2").transform, level01spiderDefault01, closeList, null, 2f));
+            plan0101.sequentialWaves.Enqueue(wave01);
+            List<WaveAction> wave02 = new List<WaveAction>();
+            wave02.Add(new SpawnSpiderWaveAction(GameObject.Find("wp1").transform, level01spiderDefault01, closeList, null));
+            wave02.Add(new SpawnSpiderWaveAction(GameObject.Find("wp1").transform, level01spiderDefault01, closeList, null, 3f));
+            wave02.Add(new SpawnSpiderWaveAction(GameObject.Find("wp2").transform, level01spiderDefault01, closeList, null, 2f));
+            plan0101.sequentialWaves.Enqueue(wave02);
+            listsInit = true;
+        }
+
+
     }
 
     void Start()
     {
-        enemy.AIInit(defaultList, closeList, null);
+        enemy.AIInit(level01spiderDefault01, closeList, null);
+        StartPlan(0101);
+    }
+
+    public void StartPlan(int zoneId)
+    {
+        if (currentPlan != null)
+        {
+            Debug.Log("There is a current plan active");
+            return;
+        }
+
+        switch(zoneId)
+        {
+            case 0101:
+                currentPlan = plan0101;
+                break;
+        }
+
+        enemies = 0;
+        spawners = 0;
+        turrets = 0;
+        executingWaves = 0;
+
+        foreach (WaveAction action in currentPlan.initialActions)
+        {
+            action.Execute();
+        }
+
+        if (currentPlan.sequentialWaves.Count > 0)
+        {
+            StartCoroutine(CastWave(currentPlan.sequentialWaves.Dequeue()));
+        }
+    }
+
+    private IEnumerator CastWave(List<WaveAction> actions)
+    {
+        ++executingWaves;
+
+        foreach(WaveAction action in actions)
+        {
+            if (action.Delay() > 0)
+            {
+                yield return new WaitForSeconds(action.Delay());
+            }
+            action.Execute();
+        }
+
+        --executingWaves;
+    }
+
+    private bool PlanEnded()
+    {
+        if (currentPlan == null)
+            return true;
+
+        return enemies + spawners + turrets + executingWaves + currentPlan.sequentialWaves.Count == 0;
+    }
+
+    void Update()
+    {
+        
+        if(currentPlan != null)
+        {
+            if(PlanEnded())
+            {
+                //Send event plan finished
+                currentPlan = null;
+            }
+            else
+            {
+                if(enemies < currentPlan.enemiesThreshold && executingWaves == 0 && currentPlan.sequentialWaves.Count > 0)
+                {
+                    StartCoroutine(CastWave(currentPlan.sequentialWaves.Dequeue()));
+                }
+            }
+        }
     }
 
     public GameObject SelectTarget()
     {
         return player;
     }
+
+
 }

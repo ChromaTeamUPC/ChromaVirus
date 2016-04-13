@@ -50,7 +50,7 @@ public class MoveActionExecutor: BaseExecutor
             state.agent.destination = state.target.transform.position + direction;
         }
 
-        if (state.agent.remainingDistance <= 0.5)
+        if (state.agent.hasPath && state.agent.remainingDistance <= 1f)
         {
             return moveAction.nextAction;
         }
