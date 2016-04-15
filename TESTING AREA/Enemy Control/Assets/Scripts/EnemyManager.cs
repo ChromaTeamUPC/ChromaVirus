@@ -27,8 +27,9 @@ public class EnemyManager : MonoBehaviour {
             //Init behaviour actions lists
             level01spiderDefault01.Add(new MoveAction("wp2", 5.0f));
             level01spiderDefault01.Add(new SelectTargetAction("player"));
-            level01spiderDefault01.Add(new MoveAction("player", 5.0f, Action.FocusType.CONTINUOUS, Action.OffsetType.AROUND2, 15, 5, Action.INERTIA_NO));
-            level01spiderDefault01.Add(new MoveAction("wp3", 5.0f, Action.FocusType.FIXED, Action.OffsetType.POSITION_ZERO, 0, 0, Action.INERTIA_NO));
+            level01spiderDefault01.Add(new LookatAction("player"));
+            level01spiderDefault01.Add(new MoveAction("player", 5f, Action.FocusType.CONTINUOUS, Action.OffsetType.AROUND_1, 15, 1, Action.INERTIA_NO));
+            //level01spiderDefault01.Add(new MoveAction("wp3", 5.0f, Action.FocusType.FIXED, Action.OffsetType.POSITION_ZERO, 0, 0, Action.INERTIA_NO));
 
             closeList.Add(new MoveAction("wp2", 10f, true, Action.LIST_FINISHED));
             

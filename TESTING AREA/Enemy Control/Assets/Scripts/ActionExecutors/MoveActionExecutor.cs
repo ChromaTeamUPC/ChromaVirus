@@ -27,12 +27,12 @@ public class MoveActionExecutor: BaseExecutor
             case Action.OffsetType.POSITION_ZERO:
                 direction = new Vector3(0, 0, 0);
                 break;
-            case Action.OffsetType.AROUND1:
+            case Action.OffsetType.AROUND_1:
                 direction = new Vector3(0, 0, 1);
                 direction = Quaternion.Euler(0, moveAction.angle, 0) * direction;
                 direction *= moveAction.distance;
                 break;
-            case Action.OffsetType.AROUND2:
+            case Action.OffsetType.AROUND_2:
                 direction = (state.agent.transform.position - state.target.transform.position).normalized;
                 direction = Quaternion.Euler(0, moveAction.angle, 0) * direction;
                 direction *= moveAction.distance;
@@ -57,7 +57,7 @@ public class MoveActionExecutor: BaseExecutor
                 state.target = enemyManager.SelectTarget();
             }
 
-            if (moveAction.offsetType == Action.OffsetType.AROUND2)
+            if (moveAction.offsetType == Action.OffsetType.AROUND_2)
             {
                 direction = (state.agent.transform.position - state.target.transform.position).normalized;
                 direction = Quaternion.Euler(0, moveAction.angle, 0) * direction;

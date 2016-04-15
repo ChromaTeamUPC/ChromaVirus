@@ -8,12 +8,15 @@ public class Action
     public const int LIST_FINISHED = -3;
     public const bool INERTIA_NO = false;
     public const bool INERTIA_YES = true;
+    public const bool WARNING_NO = false;
+    public const bool WARNING_YES = true;
+
 
     public enum OffsetType
     {
         POSITION_ZERO,      // same coordinates as the waypoint
-        AROUND1,            // around the target, at some degrees (relative to scenario) and distance 
-        AROUND2             // around the target, at some degrees (relative to enemy) and distance 
+        AROUND_1,            // around the target, at some degrees (relative to scenario) and distance 
+        AROUND_2             // around the target, at some degrees (relative to enemy) and distance 
     }
 
     public enum FocusType
@@ -27,7 +30,8 @@ public class Action
         NONE,
         SELECT_TARGET,
         MOVE,
-        ATTACK
+        SPIDER_ATTACK_1,
+        LOOKAT
     }
 
     public Type actionType;
@@ -75,5 +79,28 @@ public class MoveAction: Action
         angle = ang;
         distance = dist;
         inertia = ine;
+    }
+}
+
+public class LookatAction : Action
+{
+    public string targetId;
+
+    public LookatAction(string target, int next = Action.NEXT_ACTION) : base(next)
+    {
+        actionType = Type.LOOKAT;
+        targetId = target;
+    }
+}
+
+public class SpiderAttack1Action : Action
+{
+    public float delay;     // delay between attacks
+    public bool warning;    // if true, the spider flashes an instant before attack
+    public SpiderAttack1Action(bool warn = WARNING_YES, float dly = 1.0f, int next = Action.NEXT_ACTION) : base(next)
+    {
+        actionType = Type.SPIDER_ATTACK_1;
+        warning = warn;
+        delay = dly;
     }
 }

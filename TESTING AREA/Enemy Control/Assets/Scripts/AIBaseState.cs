@@ -16,6 +16,7 @@ public class AIBaseState
     protected BaseExecutor currentExecutor;
     protected SelectTargetExecutor selectExecutor;
     protected MoveActionExecutor moveExecutor;
+    protected LookatActionExecutor lookatExecutor;
 
     public AIBaseState(MonoBehaviour p)
     {
@@ -26,6 +27,8 @@ public class AIBaseState
         selectExecutor.Init(this);
         moveExecutor = new MoveActionExecutor();
         moveExecutor.Init(this);
+        lookatExecutor = new LookatActionExecutor();
+        lookatExecutor.Init(this);
 
     }
 
@@ -84,6 +87,10 @@ public class AIBaseState
 
             case Action.Type.MOVE:
                 currentExecutor = moveExecutor;
+                break;
+
+            case Action.Type.LOOKAT:
+                currentExecutor = lookatExecutor;
                 break;
         }
 
