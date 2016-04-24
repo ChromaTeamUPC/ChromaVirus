@@ -1,128 +1,62 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class GameManager : MonoBehaviour {
 
-    public Transform spawnPoint1;
-    public Transform spawnPoint2;
-    public Transform spawnPoint3;
+    private AsyncOperation loadLevel;
 
-    public GameObject player1Prefab;
-    public GameObject player2Prefab;
+    private bool paused = false;
 
-    public Transform player1SpawnPoint;
-    public Transform player2SpawnPoint; 
-
-    public Material enemyRedMaterial;
-    public Material enemyGreenMaterial;
-    public Material enemyBlueMaterial;
-    public Material enemyYellowMaterial;
-    private ObjectPool aracnoBotPool;
-
-    public GameObject player1;
-    public PlayerController player1Controller;
-    public GameObject player2;
-    public PlayerController player2Controller;
     // Use this for initialization
-    public void Init () {
-        mng.eventManager.StartListening(EventManager.EventType.PLAYER_DIED, PlayerDied);
-        mng.eventManager.StartListening(EventManager.EventType.PLAYER_WIN, PlayerWin);
-        mng.eventManager.StartListening(EventManager.EventType.COLOR_CHANGED, ColorChanged);
-
-        aracnoBotPool = mng.poolManager.aracnoBotPool;      
-    }
-
-    void Start()
-    {
-        player1 = Instantiate(player1Prefab, player1SpawnPoint.position, Quaternion.identity) as GameObject;
-        player1.tag = "Player1";
-        player1Controller = player1.GetComponent<PlayerController>();
-        player1Controller.InitPlayer(1);
-
-        player2 = Instantiate(player2Prefab, player2SpawnPoint.position, Quaternion.identity) as GameObject;
-        player2.tag = "Player2";
-        player2Controller = player2.GetComponent<PlayerController>();
-        player2Controller.InitPlayer(2);
-        //Test
-        //InvokeRepeating("SpawnEnemies", 2f, 3f);
-        StartCoroutine(SpawnEnemies(spawnPoint1.transform.position, 2f, 3f));
-        StartCoroutine(SpawnEnemies(spawnPoint2.transform.position, 6f, 2f));
-
-        Debug.Log(StaticVarsTest.foo);
-    }
-
-    //Test function
-    void ColorChanged(EventInfo eventInfo)
-    {
-        switch (((ColorEventInfo)eventInfo).newColor)
+    void Start () {
+	
+	}
+	
+	// Update is called once per frame
+	void Update () {
+	    if(Input.GetButtonDown("Ok"))
         {
-            case ChromaColor.RED: RenderSettings.skybox.SetColor("_Tint", Color.red); break;
-            case ChromaColor.GREEN: RenderSettings.skybox.SetColor("_Tint", Color.green); break;
-            case ChromaColor.BLUE: RenderSettings.skybox.SetColor("_Tint", Color.blue); break;
-            case ChromaColor.YELLOW: RenderSettings.skybox.SetColor("_Tint", Color.yellow); break;
+            paused = !paused;
+
+            if (paused)
+                Time.timeScale = 0.000000000001f;
+            else
+                Time.timeScale = 1f;
         }
-        
-    }
+	}
 
-    IEnumerator SpawnEnemies(Vector3 position, float initialDelay, float repeatRate)
+    public void StartPreloadingFirstLevel()
     {
-        yield return new WaitForSeconds(initialDelay);
-
-        while (true)
+        if (loadLevel == null)
         {
-            //Get enemy from pool
-            GameObject enemy = aracnoBotPool.GetObject();
-            //Set objective goal
-            EnemyMovement eMov = enemy.GetComponent<EnemyMovement>();
-            eMov.goal = player1.transform;
-
-            //Set spawnpoint
-            //enemy.transform.position = spawnPoint1.transform.position;
-            enemy.transform.position = position;
-
-            ChromaColor randColor = (ChromaColor)Random.Range((int)ChromaColorInfo.First, (int)ChromaColorInfo.Last + 1);
-            enemy.GetComponent<EnemyHealth>().color = randColor;
-            Material mat = enemyRedMaterial;
-            switch (randColor)
-            {
-                case ChromaColor.RED: mat = enemyRedMaterial; break;
-                case ChromaColor.GREEN: mat = enemyGreenMaterial; break;
-                case ChromaColor.BLUE: mat = enemyBlueMaterial; break;
-                case ChromaColor.YELLOW: mat = enemyYellowMaterial; break;
-            }
-            //enemy.GetComponent<Renderer>().material = mat;
-            enemy.GetComponentInChildren<Renderer>().material = mat;
-
-            //Activate enemy
-            enemy.SetActive(true);
-
-            yield return new WaitForSeconds(repeatRate);
+            loadLevel = SceneManager.LoadSceneAsync("Level01");
+            loadLevel.allowSceneActivation = false;
         }
     }
 
-    public void PlayerDied(EventInfo eventInfo)
+
+    public void StartNewGame(int numPlayers)
     {
-        StartCoroutine("GoToMainMenu");
+        InitPlayers(numPlayers);
+
+        loadLevel.allowSceneActivation = true;
     }
 
-    public void PlayerWin(EventInfo eventInfo)
+    public void InitPlayers(int numPlayers)
     {
-        StartCoroutine("GoToCredits");
-    }
-
-    IEnumerator GoToMainMenu()
-    {
-        yield return new WaitForSeconds(3.0f);
-
-        SceneManager.LoadScene("MainMenu");
-    }
-
-    IEnumerator GoToCredits()
-    {
-        yield return new WaitForSeconds(3.0f);
-
-        SceneManager.LoadScene("GameCredits");
+        rsc.gameInfo.numberOfPlayers = numPlayers;
+        rsc.gameInfo.player1Controller.ResetPlayer();
+        rsc.gameInfo.player1Controller.Active = true;
+        rsc.gameInfo.player2Controller.ResetPlayer();
+        if (numPlayers == 2)
+        {
+            rsc.gameInfo.player2Controller.Active = true;
+            rsc.gameInfo.player2.SetActive(true);
+        }
+        else {
+            rsc.gameInfo.player2Controller.Active = false;
+            rsc.gameInfo.player2.SetActive(false);
+        }
     }
 }

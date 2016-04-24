@@ -8,22 +8,43 @@ public class EventInfo
     //Events that need no extra info, can use this object to improve performance
     public static EventInfo emptyInfo = new EventInfo();
 }
+public class ColorEventInfo : EventInfo
+{
+    public static ColorEventInfo eventInfo = new ColorEventInfo();
+
+    public ChromaColor newColor;
+}
+
+public class ZoneReachedInfo : EventInfo
+{
+    public static ZoneReachedInfo eventInfo = new ZoneReachedInfo();
+
+    public int zoneId;
+    public string playerTag;
+}
+
+public class ZonePlanEndedInfo : EventInfo
+{
+    public static ZonePlanEndedInfo eventInfo = new ZonePlanEndedInfo();
+
+    public int planId;
+}
 
 public class PlayerSpawnedEventInfo : EventInfo
 {
+    public static PlayerSpawnedEventInfo eventInfo = new PlayerSpawnedEventInfo();
+
     public PlayerController player;
 }
 
 public class PlayerDamagedEventInfo : EventInfo
 {
+    public static PlayerDamagedEventInfo eventInfo = new PlayerDamagedEventInfo();
+
     public int damage;
     public int currentHealth;
 }
 
-public class ColorEventInfo : EventInfo
-{
-    public ChromaColor newColor;
-}
 
 public class CameraEventInfo : EventInfo
 {
@@ -42,17 +63,47 @@ public class EventManager : MonoBehaviour {
         PLAYER_DAMAGED,
         PLAYER_DIED,
         PLAYER_WIN,
+
         ENEMY_SPAWNED,
         ENEMY_DIED,
+
+        TURRET_SPAWNED,
+        TURRET_DESTROYED,
+
+        SPAWNER_ACTIVATED,
+        SPAWNER_DESTROYED,
+
+        ZONE_REACHED,
+        ZONE_PLAN_FINISHED,
+
         COLOR_CHANGED,
         CAMERA_CHANGED
     }
 
     private Dictionary<EventType, CustomEvent> eventDictionary;
 
-    public void Init()
+    private bool active;
+
+    void Awake()
     {
+        Debug.Log("Event Manager created");
         eventDictionary = new Dictionary<EventType, CustomEvent>();
+        active = true;
+    }
+
+    void OnDestroy()
+    {
+        Debug.Log("Event Manager destroyed");
+    }
+
+    public void Activate()
+    {
+        active = true;
+    }
+
+    public void Deactivate()
+    {
+        active = false;
     }
 
     public void StartListening(EventType eventType, UnityAction<EventInfo> listener)
@@ -81,10 +132,13 @@ public class EventManager : MonoBehaviour {
 
     public void TriggerEvent(EventType eventType, EventInfo eventInfo)
     {
-        CustomEvent thisEvent = null;
-        if(eventDictionary.TryGetValue(eventType, out thisEvent))
+        if (active)
         {
-            thisEvent.Invoke(eventInfo);
+            CustomEvent thisEvent = null;
+            if (eventDictionary.TryGetValue(eventType, out thisEvent))
+            {
+                thisEvent.Invoke(eventInfo);
+            }
         }
     }
 

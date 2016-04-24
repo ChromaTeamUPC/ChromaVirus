@@ -10,7 +10,8 @@ public class ObjectPool : MonoBehaviour {
     private Queue<GameObject> pool;
 
 	// Use this for initialization
-	void Awake () {
+	void Awake ()
+    {
         Transform trans = transform;
         GameObject aux;
         pool = new Queue<GameObject>(poolSize);
@@ -21,12 +22,22 @@ public class ObjectPool : MonoBehaviour {
             aux.transform.SetParent(trans);
             pool.Enqueue(aux);
         }
+        Debug.Log("Object Pool created");
     }
 
+    void OnDestroy()
+    {
+        Debug.Log("Object Pool destroyed");
+    }
+    
     public GameObject GetObject()
     {
         if (pool.Count > 0)
-            return pool.Dequeue();
+        {
+            GameObject pooledObject = pool.Dequeue();
+            pooledObject.SetActive(true);
+            return pooledObject;
+        }
         else
             return null;
     }

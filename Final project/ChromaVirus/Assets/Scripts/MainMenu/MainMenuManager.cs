@@ -10,6 +10,9 @@ public class MainMenuManager : MonoBehaviour {
         FadingIn,
         Idle,
         ShowHelp,
+        SelectingPlayers,
+        FadingToGame,
+        FadingToCredits,
         FadingOut
     }
     private MainMenuState currentState;
@@ -19,43 +22,78 @@ public class MainMenuManager : MonoBehaviour {
     public Button playBtn;
     public Button helpBtn;
     public Button creditsBtn;
-    public Button exitBtn; 
+    public Button exitBtn;
+
+    public Button p1Btn;
+    public Button p2Btn;
 
     public GameObject help;
-    private bool helpOpen = false;
+    public GameObject playerSelection;
+    private AsyncOperation loadResources;
     private AsyncOperation loadLevel;
+
+    private int playersNumber = 1;
+
+    void Awake()
+    {
+        //Loading of managers, players, and various resources
+        loadResources = SceneManager.LoadSceneAsync("LoadingScene", LoadSceneMode.Additive);
+    }
 
     void Start()
     {
-        DisableButtons();
-        loadLevel = SceneManager.LoadSceneAsync("Level01");
-        loadLevel.allowSceneActivation = false;
+        DisableMainButtons();      
         currentState = MainMenuState.FadingIn;
-        fadeScript.StartFadingToClear();
+        fadeScript.StartFadingToClear(Color.black, 1f);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (helpOpen && Input.GetButtonDown("Back"))
-        {
-            help.SetActive(false);
-            helpOpen = false;
-        }
-
         switch (currentState)
         {
             case MainMenuState.FadingIn:
                 if (!fadeScript.FadingToClear)
                 {
-                    EnableButtons();
+                    EnableMainButtons();
                     currentState = MainMenuState.Idle;
+                }
+                break;
+
+            case MainMenuState.ShowHelp:
+                if(Input.GetButtonDown("Back"))
+                {
+                    help.SetActive(false);
+                    EnableMainButtons();
+                }
+                break;
+
+            case MainMenuState.SelectingPlayers:
+                if (Input.GetButtonDown("Back"))
+                {
+                    DisablePlayerSelectionButtons();
+                    playerSelection.SetActive(false);
+                    EnableMainButtons();                               
+                }
+                break;
+
+            case MainMenuState.FadingToGame:
+                if(!fadeScript.FadingToColor)
+                {
+                    rsc.gameMng.StartNewGame(playersNumber);
+                }
+                break;
+
+            case MainMenuState.FadingToCredits:
+                if (!fadeScript.FadingToColor)
+                {
+                    SceneManager.LoadScene("Credits");
                 }
                 break;
         }
     }
 
-    private void EnableButtons()
+    private void EnableMainButtons()
     {
         playBtn.interactable = true;
         helpBtn.interactable = true;
@@ -64,7 +102,7 @@ public class MainMenuManager : MonoBehaviour {
         playBtn.Select();
     }
 
-    private void DisableButtons()
+    private void DisableMainButtons()
     {
         playBtn.interactable = false;
         helpBtn.interactable = false;
@@ -72,21 +110,67 @@ public class MainMenuManager : MonoBehaviour {
         exitBtn.interactable = false;
     }
 
+    private void EnablePlayerSelectionButtons()
+    {      
+        p1Btn.interactable = true;
+        
+        if(Input.GetJoystickNames().Length > 1)
+        {
+            p2Btn.interactable = true;
+        }
+        else
+        {
+            p2Btn.interactable = false;
+        }
+
+        p1Btn.Select();
+    }
+
+    private void DisablePlayerSelectionButtons()
+    {
+        p1Btn.interactable = false;
+        p2Btn.interactable = false;
+    }
+
     public void OnClickStart()
     {
-        //TODO: Select players
-        loadLevel.allowSceneActivation = true;
+        if (loadResources.isDone)
+        {
+            rsc.gameMng.StartPreloadingFirstLevel();
+            DisableMainButtons();
+            playerSelection.SetActive(true);
+            EnablePlayerSelectionButtons();
+            currentState = MainMenuState.SelectingPlayers;
+        }
+    }
+
+    public void Select1Player()
+    {
+        playersNumber = 1;
+        DisablePlayerSelectionButtons();
+        currentState = MainMenuState.FadingToGame;
+        fadeScript.StartFadingToColor();      
+    }
+
+    public void Select2Players()
+    {
+        playersNumber = 2;
+        DisablePlayerSelectionButtons();
+        currentState = MainMenuState.FadingToGame;
+        fadeScript.StartFadingToColor();     
     }
 
     public void OnClickHelp()
     {
+        DisableMainButtons();
         help.SetActive(true);
-        helpOpen = true;
+        currentState = MainMenuState.ShowHelp;
     }
 
     public void OnClickCredits()
     {
-        SceneManager.LoadScene("Credits");
+        currentState = MainMenuState.FadingToCredits;
+        fadeScript.StartFadingToColor();      
     }
 
     public void OnClickExit()
