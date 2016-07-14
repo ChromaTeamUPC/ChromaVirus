@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using XInputDotNetPure;
 
 public class PlayerController : MonoBehaviour {
 
@@ -199,6 +200,8 @@ public class PlayerController : MonoBehaviour {
         {
             nextFire = Time.time + fireRate;
             shotLight.enabled = true;
+
+            GamePad.SetVibration(PlayerIndex.One, 0f, 0f);
 
             // check if it's first shot (single projectile)...
             if (isFirstShot)
