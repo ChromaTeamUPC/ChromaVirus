@@ -73,6 +73,8 @@ public class Snake2 : MonoBehaviour
                 {
                     consolidatedDistance += distanceBetween;
                     current = next;
+                    //if we are in the last waypoint, there is nothing more we can do, so we quit
+                    if (next.next == null) return;
                     next = next.next;
                     distanceBetween = (current.position - next.position).magnitude;
                 }
